@@ -15,5 +15,3 @@ file.mp3, file(1).mp3, file(2).mp3, etc. according to the objects encountered in
 the html soup scan.
 
 Runs with Python 3.10
-
-Contact: Dr. Ralf Antonius Timmermann, rtimmermann@astro.uni-bonn.de
