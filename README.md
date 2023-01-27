@@ -1,7 +1,7 @@
 # WDR3 Concert Downloader
 
-Downloads mp3 audio files from a WDR3 concert player site if the concert 
-will be available for re-listening for 30 days in the media library the day 
+Downloads audio mp3 files from a WDR3 concert player website, if the concert 
+is available for re-listening for 30 days in the media library the day 
 after the broadcast, hence, no download button
 is provided. From the address bar of your web browser copy the url of the 
 site - where the concert resides - and run the code:
