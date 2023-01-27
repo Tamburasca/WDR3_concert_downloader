@@ -1,9 +1,9 @@
 # WDR3 Concert Downloader
 
 Downloads audio mp3 files from a WDR3 concert player site if this website
-exhibits only an afterhearing option of 30 days and, hence, no download button
-is available. Copy the url of the site,
-where the concert resides, and run the code:
+permits only an afterhearing option of 30 days and, hence, no download button
+is available. From the address bar of your web browser copy the url of the 
+site - where the concert resides - and run the code:
 
     $ python3 WDR3_concert_downloader/src <url> -o <file.mp3>
 where e.g.
