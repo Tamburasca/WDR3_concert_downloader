@@ -24,5 +24,5 @@ Note: this downloader is not supported by any broadcasting organization, thus is
 inofficial!
 
 I found no way to downgrade the bitrate of the mp3 audio file to a smaller 
-size without having to install **ffmpeg** or with an add-on for **sox** locally. 
+size without having to install **ffmpeg** or an add-on for **sox** locally. 
 Suggestions welcome!
