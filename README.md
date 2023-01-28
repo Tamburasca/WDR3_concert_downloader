@@ -1,6 +1,7 @@
 # WDR3 Concert Downloader
 
-Downloads audio mp3 files from a WDR3 concert player website, if the concert 
+Downloads audio mp3 files (@256 kbit/s) 
+from a WDR3 concert player website, if the concert 
 is made available in the media library for re-listening over 
 30 days after its broadcast, hence, no download button
 is provided. From the address bar of your web browser copy the url of the 
