@@ -22,3 +22,7 @@ Runs with Python 3.10
 
 Note: this downloader is not supported by any broadcasting organization, thus is 
 inofficial!
+
+I have not found any way to downgrade the bitrate of the mp3 to a smaller 
+size without having to install the ffmpeg tool locally. 
+Suggestions welcome!
