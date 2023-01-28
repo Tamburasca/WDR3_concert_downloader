@@ -1,8 +1,8 @@
 # WDR3 Concert Downloader
 
 Downloads audio mp3 files from a WDR3 concert player website, if the concert 
-is available for re-listening for 30 days in the media library the day 
-after the broadcast, hence, no download button
+is made available in the media library for re-listening over 
+30 days after its broadcast, hence, no download button
 is provided. From the address bar of your web browser copy the url of the 
 website, where the concert resides and then execute the following command:
 
@@ -19,4 +19,5 @@ encountered in the html soup scan.
 
 Runs with Python 3.10
 
-Comments welcome
+Note: this downloader is not supported by any broadcasting organization, thus is 
+inofficial!
