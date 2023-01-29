@@ -12,19 +12,20 @@ file.mp3, file(1).mp3, file(2).mp3, etc. according to the objects encountered in
 the html soup scan.
 """
 
-import argparse
-from concert_downloader import wdr3_scraper
+from argparse import ArgumentParser
+from sys import exit
+from WDR3_concert_downloader.concert_downloader import wdr3_scraper
 
 __author__ = "Dr. Ralf Antonius Timmermann"
 __copyright__ = "Copyright (c) 2022, Dr. Ralf Antonius Timmermann All rights reserved."
 __credits__ = []
 __license__ = "BSD-3-Clause"
-__version__ = "0.4"
+__version__ = "1.1"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "rtimmermann@astro.uni-bonn.de"
 __status__ = "Prod"
 
-parser = argparse.ArgumentParser(
+parser = ArgumentParser(
     description="Downloads concert mp3 audio files from WDR3 sites.")
 parser.add_argument(
     '-o', '--output',
@@ -33,7 +34,8 @@ parser.add_argument(
 parser.add_argument('url',
                     help='URL of concert player')
 
-exit(
-    wdr3_scraper(url=parser.parse_args().url,
-                 file=parser.parse_args().output)
-)
+if __name__ == '__main__':
+    exit(
+        wdr3_scraper(url=parser.parse_args().url,
+                     file=parser.parse_args().output)
+    )
