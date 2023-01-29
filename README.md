@@ -25,7 +25,7 @@ Runs with Python 3.10
 Note: this downloader is not supported by any broadcasting organization, thus is 
 inofficial! The current application supplements 
 [Streamripper](https://streamripper.sourceforge.net/) 
-that creates an audio native file from a broadcaster's mp3 livestream.
+that creates a native audio file from a broadcaster's mp3 livestream.
 
 I found no way to downgrade the bitrate of the mp3 file to a smaller 
 size without having to install **ffmpeg** or an add-on for **sox** locally. 
