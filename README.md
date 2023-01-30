@@ -22,9 +22,9 @@ encountered in the html soup scan.
 
 Runs with Python 3.10
 
-On a Linux OS run (as bundled with PyInstaller):
+On a Linux OS run [download](https://github.com/Tamburasca/WDR3_concert_downloader/releases):
 
-    $ ./WDR3_concert_downloader/dist/Linux/WDR3_concert_downloader <url> -o <file.mp3>
+    $ ./WDR3_concert_downloader <url> -o <file.mp3>
 
 Note: this downloader is not supported by any broadcasting organization, thus is 
 inofficial! The current application supplements 
