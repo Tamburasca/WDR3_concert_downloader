@@ -25,17 +25,21 @@ __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "rtimmermann@astro.uni-bonn.de"
 __status__ = "Prod"
 
-parser = ArgumentParser(
-    description="Downloads concert mp3 audio files from WDR3 sites.")
-parser.add_argument(
-    '-o', '--output',
-    required=True,
-    help='Output file (.mp3)')
-parser.add_argument('url',
-                    help='URL of concert player')
 
-if __name__ == '__main__':
+def main():
+    parser = ArgumentParser(
+        description="Downloads concert mp3 audio files from WDR3 sites.")
+    parser.add_argument(
+        '-o', '--output',
+        required=True,
+        help='Output file (.mp3)')
+    parser.add_argument('url',
+                        help='URL of concert player')
     exit(
         wdr3_scraper(url=parser.parse_args().url,
                      file=parser.parse_args().output)
     )
+
+
+if __name__ == '__main__':
+    main()
