@@ -23,7 +23,7 @@ encountered in the html soup scan.
 Runs with Python 3.10
 
 On a Linux OS [download](https://github.com/Tamburasca/WDR3_concert_downloader/releases)
-the executable file (Windows pending):
+the executable file as was bundled with PyInstaller and run (sorry, no Windows 10/11 yet):
 
     $ ./WDR3_concert_downloader <url> -o <file.mp3>
 
