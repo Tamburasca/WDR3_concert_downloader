@@ -25,7 +25,7 @@ def wdr3_scraper(url: str, file: str) -> int:
                 s = json.loads(
                     _res.lstrip("$mediaObject.jsonpHelper.storeAndPlay(").rstrip(");"))
                 mp3_url = "https:{}".format(s['mediaResource']['dflt']['audioURL'])
-                # apri mp3 object e download binary content a file
+                # apri mp3 object e download binary content sul file
                 doc = requests.get(url=mp3_url)
                 file_download = file if counter == 0 else "{}({}).mp3".format(file.rsplit(".", 1)[0],
                                                                               counter)

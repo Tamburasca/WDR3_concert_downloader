@@ -19,15 +19,16 @@ files will be downloaded and named according the scheme
 file.mp3, file(1).mp3, file(2).mp3, etc. in the order the objects are 
 encountered in the html soup scan.
 
-Runs with Python 3.10
+Runs with Python3.10
 
 On a Linux OS [download](https://github.com/Tamburasca/WDR3_concert_downloader/releases)
-the executable file as was bundled with PyInstaller and run (sorry, no Windows 10/11 yet):
+the executable file as was bundled with PyInstaller and run (sorry, no Windows 10/11 
+version available yet):
 
     $ ./WDR3_concert_downloader <url> -o <file.mp3>
 
-Note: this downloader is not supported by any broadcasting organization, thus is 
-inofficial! The current application supplements 
+Note: this downloader is not supported by the WDR broadcasting organization, 
+thus is inofficial! The current application supplements 
 [Streamripper](https://streamripper.sourceforge.net/) 
 that creates a native audio file from a broadcaster's mp3 livestream.
 
