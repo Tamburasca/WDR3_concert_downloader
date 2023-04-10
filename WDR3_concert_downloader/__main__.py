@@ -14,7 +14,7 @@ the html soup scan.
 
 from argparse import ArgumentParser
 from sys import exit
-from WDR3_concert_downloader.concert_downloader import wdr3_scraper
+from concert_downloader import wdr3_scraper
 
 __author__ = "Dr. Ralf Antonius Timmermann"
 __copyright__ = "Copyright (c) 2022, Dr. Ralf Antonius Timmermann All rights reserved."

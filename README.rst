@@ -9,7 +9,7 @@ is dispositional to the audience.
 From the address bar of your web browser copy the url of the 
 website, where the concert resides and then execute the following command:
 
-    $ python3 WDR3_concert_downloader/src <url> -o <file.mp3>
+    $ python3 WDR3_concert_downloader/ <url> -o <file.mp3>
 
 where e.g.
 
