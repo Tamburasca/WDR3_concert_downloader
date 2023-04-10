@@ -12,7 +12,6 @@ website, where the concert resides and then execute the following command:
     $ python3 WDR3_concert_downloader/ <url> -o <file.mp3>
 
 where e.g.
-
 url = https://www1.wdr.de/radio/wdr3/programm/sendungen/wdr3-konzert/konzertplayer-klassik-tage-alter-musik-in-herne-concerto-romano-alessandro-quarta-100.html
 
 Note: if multiple mp3 media objects are available on the website provided,

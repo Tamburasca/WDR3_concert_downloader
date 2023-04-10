@@ -11,7 +11,7 @@ with open('LICENSE') as f:
 
 setup(
     name='WDR3 Concert Downloader',
-    version='1.0.0',
+    version='1.2.0',
     description='WDR3 Concert Downloader for their websites, where the '
                 'download button it lacking.',
     long_description=readme,
