@@ -23,15 +23,16 @@ def wdr3_scraper(url: str, file: str) -> int:
                 # apri ogni javascript media object e taglia non-JSON sui due lati
                 res = requests.get(url=sneak).text
                 s = json.loads(
-                    res.lstrip("$mediaObject.jsonpHelper.storeAndPlay(").rstrip(
-                        ");")
+                    res.lstrip(
+                        "$mediaObject.jsonpHelper.storeAndPlay("
+                    ).rstrip(");")
                 )
                 mp3_url = "https:{}".format(
                     s['mediaResource']['dflt']['audioURL']
                 )
                 # apri mp3 object e download binary content sul file
                 doc = requests.get(url=mp3_url)
-                file_download = file if counter == 0 else "{}({}).mp3".format(
+                file_download = file if counter == 0 else "{0}({1}).mp3".format(
                     file.rsplit(".", 1)[0],
                     counter
                 )
