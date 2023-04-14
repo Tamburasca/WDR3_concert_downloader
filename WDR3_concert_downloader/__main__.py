@@ -3,7 +3,9 @@
 Downloads mp3 files from a site where the WDR3 concert player is located if
 there's only an afterhearing option of 30 days and, hence, no download button
 available. Copy the url of the site, where the concert resides and run the code:
-$ python3 WDR3_concert_downloader/ <url> -o <file.mp3>
+
+$ python3 WDR3_concert_downloader [-h] [-o file.mp3 (default: download.mp3)] url
+
 where e.g.
 url = https://www1.wdr.de/radio/wdr3/programm/sendungen/wdr3-konzert/konzertplayer-klassik-tage-alter-musik-in-herne-concerto-romano-alessandro-quarta-100.html
 Note: if there are multiple mp3 media objects available on the provided website,
@@ -20,7 +22,7 @@ __author__ = "Dr. Ralf Antonius Timmermann"
 __copyright__ = "Copyright (c) 2022, Dr. Ralf Antonius Timmermann All rights reserved."
 __credits__ = []
 __license__ = "BSD-3-Clause"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "rtimmermann@astro.uni-bonn.de"
 __status__ = "Prod"
@@ -31,10 +33,10 @@ def main():
         description="Downloads concert mp3 audio files from WDR3 sites.")
     parser.add_argument(
         '-o', '--output',
-        required=True,
-        help='Output file (.mp3)')
+        default='download.mp3',
+        help='Output file (.mp3) (default: download.mp3)')
     parser.add_argument('url',
-                        help='URL of concert player')
+                        help='URL of web site where concert player resides')
     exit(
         wdr3_scraper(url=parser.parse_args().url,
                      file=parser.parse_args().output)
