@@ -21,7 +21,7 @@ def wdr3_scraper(url: str, file: str) -> int:
             data_ext = value.get('data-extension')
             if data_ext:
                 sneak = json.loads(data_ext)['mediaObj']['url']
-                # apri ogni l'oggetto javascript media e taglia non-JSON sui due lati
+                # apri ogni oggetto javascript media e taglia non-JSON sui due lati
                 res = requests.get(url=sneak)
                 res.raise_for_status()
                 s = json.loads(
