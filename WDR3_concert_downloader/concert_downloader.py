@@ -19,6 +19,9 @@ def wdr3_scraper(url: str, file: str) -> int:
         soup = BeautifulSoup(response.text, "html.parser")
         for value in soup.find_all('a'):
             data_ext = value.get('data-extension')
+            # in caso di fallimento, prova l'altro link
+            if data_ext is None:
+                data_ext = value.get('data-extension-ard')
             if data_ext:
                 sneak = json.loads(data_ext)['mediaObj']['url']
                 # apri ogni oggetto javascript media e taglia non-JSON sui due lati

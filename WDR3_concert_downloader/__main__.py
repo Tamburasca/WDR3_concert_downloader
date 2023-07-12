@@ -19,11 +19,18 @@ from argparse import ArgumentParser
 from sys import exit
 from concert_downloader import wdr3_scraper
 
+"""
+version history:
+2023/03/04 - Ralf A. Timmermann <rtimmermann@astro.uni-bonn.de>
+- version 1.3.3
+    * seek mp3 in 'data-extension' and subsquently 'data-extension-ard'
+"""
+
 __author__ = "Dr. Ralf Antonius Timmermann"
 __copyright__ = "Copyright (c) 2022, Dr. Ralf Antonius Timmermann All rights reserved."
 __credits__ = []
 __license__ = "BSD-3-Clause"
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "rtimmermann@astro.uni-bonn.de"
 __status__ = "Prod"
