@@ -1,4 +1,4 @@
-beautifulsoup4==4.11.1
-pydantic==1.10.4
-requests==2.28.2
-setuptools==65.6.3
+beautifulsoup4>=4.12.3
+pydantic>=2.8.2
+requests>=2.32.3
+setuptools>=72.2.0

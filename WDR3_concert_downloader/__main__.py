@@ -17,7 +17,7 @@ the html soup scan.
 
 from argparse import ArgumentParser
 from sys import exit
-from concert_downloader import wdr3_scraper
+from concert_downloader1 import wdr3_scraper
 
 """
 version history:
@@ -27,7 +27,8 @@ version history:
 """
 
 __author__ = "Dr. Ralf Antonius Timmermann"
-__copyright__ = "Copyright (c) 2022, Dr. Ralf Antonius Timmermann All rights reserved."
+__copyright__ = ("Copyright (c) 2024, Dr. Ralf Antonius Timmermann "
+                 "All rights reserved.")
 __credits__ = []
 __license__ = "BSD-3-Clause"
 __version__ = "1.3.3"
@@ -48,8 +49,10 @@ def main():
     parser.add_argument('url',
                         help='URL of web site where concert player resides')
     exit(
-        wdr3_scraper(url=parser.parse_args().url,
-                     file=parser.parse_args().output)
+        wdr3_scraper(
+            url=parser.parse_args().url,
+            file=parser.parse_args().output
+        )
     )
 
 
