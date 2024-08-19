@@ -35,7 +35,7 @@ __credits__ = []
 __license__ = "BSD 3-Clause"
 __version__ = "2.0.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
-__email__ = "rtimmermann@astro.uni-bonn.de"
+__email__ = "rtimmermann@gmx.de"
 __status__ = "Prod"
 
 

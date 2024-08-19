@@ -21,7 +21,7 @@ def wdr3_scraper(
         response = requests.get(url=TestURL(url=url).url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        for value in soup.find_all('script'):
+        for value in soup.find_all('script', text=pattern):
             mp3_url = re.findall(pattern, value.text)
             if mp3_url:
                 sneak_mp3 = "https:{}".format(mp3_url[0])
