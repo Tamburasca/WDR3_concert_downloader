@@ -11,7 +11,7 @@ class TestURL(BaseModel):
 
 def wdr3_scraper(
         url: str,
-        file: str
+        file: str = "download.mp3"
 ) -> int:
     pattern = re.compile(r'"audioURL" : "(.*)"')
     counter = 0
@@ -46,8 +46,7 @@ def wdr3_scraper(
     except NameError as e:
         print("Error: download filename '{}' is incorrect.".format(e))
     except FileExistsError as e:
-        print("Error: download filename '{}' already exists. "
-              "Exiting ...".format(e))
+        print("Error: download file '{}' exists. Exiting ...".format(e))
     except Exception as e:
         print("Occurred error: {}".format(str(e)))  # Bih, chi camurrìa!
     return 1
