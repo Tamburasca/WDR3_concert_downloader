@@ -17,7 +17,7 @@ def wdr3_scraper(
     counter = 0
     try:
         if not file.endswith(".mp3"):
-            raise NameError
+            raise NameError(file)
         # verificare e tentare d'aprire url iniziale
         response = requests.get(url=TestURL(url=url).url)
         response.raise_for_status()
@@ -43,10 +43,11 @@ def wdr3_scraper(
                 )
                 counter += 1
         return 0
-    except NameError:
-        print("Error: filename '{}' is incorrect.".format(file))
+    except NameError as e:
+        print("Error: download filename '{}' is incorrect.".format(e))
     except FileExistsError as e:
-        print("Error: filename '{}' already exists. Exiting ...".format(e))
+        print("Error: download filename '{}' already exists. "
+              "Exiting ...".format(e))
     except Exception as e:
         print("Occurred error: {}".format(str(e)))  # Bih, chi camurrìa!
     return 1

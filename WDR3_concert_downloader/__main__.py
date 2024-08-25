@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# coding: utf-8
 
 """
 Downloads mp3 files from a site where the WDR3 concert player is located if
