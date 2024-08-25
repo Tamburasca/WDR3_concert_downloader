@@ -2,10 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from pydantic import BaseModel, HttpUrl
+import os.path
 
 
 class TestURL(BaseModel):
     url: HttpUrl
+
+
+class Error(Exception):
+    pass
+
+
+class FileExistsErr(Error):
+    def __init__(self, msg: str):
+        self.msg = msg
 
 
 def wdr3_scraper(
@@ -32,6 +42,8 @@ def wdr3_scraper(
                     file.rsplit(".", 1)[0],
                     counter
                 )
+                if os.path.isfile(file_download):
+                    raise FileExistsErr(file_download)
                 with open(file_download, 'wb') as f:
                     f.write(doc.content)
                 print("{1} downloaded to {0} successfully".format(
@@ -42,6 +54,8 @@ def wdr3_scraper(
         return 0
     except NameError:
         print("Error: filename '{}' is incorrect.".format(file))
+    except FileExistsErr as e:
+        print("Error: filename '{}' already exists. Exiting ...".format(e.msg))
     except Exception as e:
         print("Occurred error: {}".format(str(e)))  # Bih, chi camurrìa!
     return 1

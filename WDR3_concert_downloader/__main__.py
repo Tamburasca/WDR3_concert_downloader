@@ -22,10 +22,11 @@ from concert_downloader1 import wdr3_scraper
 """
 version history:
 2024/08/18 - Ralf A. Timmermann <rtimmermann@astro.uni-bonn.de>
-- version 1.3.3
-    * seek mp3 in 'data-extension' and subsquently 'data-extension-ard'
 - version 2.0.0
     * scrape script for audioURL and extract via regExp
+2024/08/25 - Ralf A. Timmermann <rtimmermann@astro.uni-bonn.de>
+- version 2.1.0
+    * exit, if download file exists
 """
 
 __author__ = "Dr. Ralf Antonius Timmermann"
@@ -33,7 +34,7 @@ __copyright__ = ("Copyright (c) 2024, Dr. Ralf Antonius Timmermann "
                  "All rights reserved.")
 __credits__ = []
 __license__ = "BSD 3-Clause"
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "rtimmermann@gmx.de"
 __status__ = "Prod"
