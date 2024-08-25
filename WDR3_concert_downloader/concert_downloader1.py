@@ -34,16 +34,16 @@ def wdr3_scraper(
         for value in soup.find_all('script', text=pattern):
             mp3_url = re.findall(pattern, value.text)
             if mp3_url:
-                sneak_mp3 = "https:{}".format(mp3_url[0])
-                # apri l'oggetto mp3 e download il binary content sul file
-                doc = requests.get(url=sneak_mp3)
-                doc.raise_for_status()
                 file_download = file if counter == 0 else "{0}({1}).mp3".format(
                     file.rsplit(".", 1)[0],
                     counter
                 )
                 if os.path.isfile(file_download):
                     raise FileExistsErr(file_download)
+                sneak_mp3 = "https:{}".format(mp3_url[0])
+                # apri l'oggetto mp3 e download il binary content sul file
+                doc = requests.get(url=sneak_mp3)
+                doc.raise_for_status()
                 with open(file_download, 'wb') as f:
                     f.write(doc.content)
                 print("{1} downloaded to {0} successfully".format(
