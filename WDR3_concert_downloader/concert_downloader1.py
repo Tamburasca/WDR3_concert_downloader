@@ -9,15 +9,6 @@ class TestURL(BaseModel):
     url: HttpUrl
 
 
-class Error(Exception):
-    pass
-
-
-class FileExistsErr(Error):
-    def __init__(self, msg: str):
-        self.msg = msg
-
-
 def wdr3_scraper(
         url: str,
         file: str
@@ -39,7 +30,7 @@ def wdr3_scraper(
                     counter
                 )
                 if os.path.isfile(file_download):
-                    raise FileExistsErr(file_download)
+                    raise FileExistsError(file_download)
                 sneak_mp3 = "https:{}".format(mp3_url[0])
                 # apri l'oggetto mp3 e download il binary content sul file
                 doc = requests.get(url=sneak_mp3)
@@ -54,8 +45,8 @@ def wdr3_scraper(
         return 0
     except NameError:
         print("Error: filename '{}' is incorrect.".format(file))
-    except FileExistsErr as e:
-        print("Error: filename '{}' already exists. Exiting ...".format(e.msg))
+    except FileExistsError as e:
+        print("Error: filename '{}' already exists. Exiting ...".format(e))
     except Exception as e:
         print("Occurred error: {}".format(str(e)))  # Bih, chi camurrìa!
     return 1
