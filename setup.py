@@ -22,7 +22,7 @@ setuptools.setup(
         "License :: OSI Approved :: BSD 3-Clause",
         "Operating System :: OS Independent",
     ],
-    python_requires='=3.10',
+    python_requires='=3.12',
     install_requires=dependencies,
     license='BSD 3-Clause',
 )
