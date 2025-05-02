@@ -32,7 +32,7 @@ def wdr3_scraper(
                 if os.path.isfile(file_download):
                     raise FileExistsError(file_download)
                 sneak_mp3 = "https:{}".format(mp3_url[0])
-                # apri l'oggetto mp3 e download il binary content sul file
+                # apri l'oggetto mp3 e download suo contenuto binario sul file
                 doc = requests.get(url=sneak_mp3)
                 doc.raise_for_status()
                 with open(file_download, 'wb') as f:
@@ -48,5 +48,5 @@ def wdr3_scraper(
     except FileExistsError as e:
         print("Error: download file '{}' exists. Exiting ...".format(e))
     except Exception as e:
-        print("Occurred error: {}".format(str(e)))  # Bih, chi camurrìa!
+        print("Occurred error: {}".format(str(e)))  # Minchia, che palle!
     return 1
