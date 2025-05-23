@@ -48,5 +48,5 @@ def wdr3_scraper(
     except FileExistsError as e:
         print("Error: download file '{}' exists. Exiting ...".format(e))
     except Exception as e:
-        print("Occurred error: {}".format(str(e)))  # Minchia, che palle!
+        print("Unknown error: {}".format(str(e)))  # Minchia, che palle!
     return 1
