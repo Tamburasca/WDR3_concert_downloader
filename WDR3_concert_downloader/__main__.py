@@ -18,7 +18,15 @@ the html soup scan.
 
 from argparse import ArgumentParser
 from sys import exit
-from concert_downloader1 import wdr3_scraper
+import importlib.util
+import os.path
+if importlib.util.find_spec("js2py_") is not None \
+        and os.path.isfile("{}/concert_downloader_js.py".format(
+    os.path.dirname(os.path.realpath(__file__)))
+):
+    from concert_downloader_js import wdr3_scraper
+else:
+    from concert_downloader1 import wdr3_scraper
 
 """
 version history:
@@ -28,14 +36,18 @@ version history:
 2024/08/25 - Ralf A. Timmermann <rtimmermann@astro.uni-bonn.de>
 - version 2.1.0
     * exit, if download file exists
+2025/05/26 - Ralf A. Timmermann <ralf.timmermann@gmx.de>
+- version 2.2.0
+    * regular expression pattern specified
+    * JavaScript conversion of code between <script> tags to Python dictionary
 """
 
 __author__ = "Dr. Ralf Antonius Timmermann"
-__copyright__ = ("Copyright (c) 2024, Dr. Ralf Antonius Timmermann "
+__copyright__ = ("Copyright (c) 2024-25, Dr. Ralf Antonius Timmermann "
                  "All rights reserved.")
 __credits__ = []
 __license__ = "BSD 3-Clause"
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "ralf.timmermann@gmx.de"
 __status__ = "Prod"

@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+"""
+see for conversion from JavaScript to Python 3.13
+https://github.com/PiotrDabkowski/Js2Py
+"""
+
 import requests
 import re
 import glob
+import js2py_  # ECMA 6 support is still experimental, check for final development
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, HttpUrl
 
 
 PATTERN = re.compile(r'"audioURL"\s?:\s?"(.*\.mp3)"')
+# Javascript definitions and supplements
+JS_PREFIX = "var globalObject = {};\n"
+JS_SUFFIX = (
+    "var firstkey = Object.keys(globalObject.gseaInlineMediaData)[0];\n"
+    "globalObject.gseaInlineMediaData[firstkey];\n"
+)
 
 
 class TestURL(BaseModel):
@@ -32,13 +44,15 @@ def wdr3_scraper(
         soup = BeautifulSoup(response.text, "html.parser")
         # extract content within script tags which matches regEx
         for script in soup.find_all('script', text=PATTERN):
-            mp3_url = re.findall(PATTERN, script.text)
+            # js_dict is js2py_.base.JsObjectWrapper object, not a dict!
+            js_dict = js2py_.eval_js(JS_PREFIX + script.string + JS_SUFFIX)
+            mp3_url = js_dict['mediaResource']['dflt']['audioURL']
             if mp3_url:
                 file_download = file if counter == 0 else "{0}({1}).mp3".format(
                     file.rsplit(".", 1)[0],
                     counter
                 )
-                sneak_mp3 = "https:{}".format(mp3_url[0])
+                sneak_mp3 = "https:{}".format(mp3_url)
                 # apri l'oggetto mp3 e download suo contenuto binario sul file
                 doc = requests.get(url=sneak_mp3)
                 doc.raise_for_status()
