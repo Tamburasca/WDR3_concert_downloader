@@ -16,10 +16,13 @@ file.mp3, file(1).mp3, file(2).mp3, etc. according to the objects encountered in
 the html soup scan.
 """
 
-from argparse import ArgumentParser
-from sys import exit
 import importlib.util
 import os.path
+import re
+from argparse import ArgumentParser
+from sys import exit
+from pydantic import BaseModel, ValidationError, StringConstraints
+from typing import Annotated
 if importlib.util.find_spec("js2py_") is not None \
         and os.path.isfile("{}/concert_downloader_js.py".format(
     os.path.dirname(os.path.realpath(__file__)))
@@ -40,6 +43,9 @@ version history:
 - version 2.2.0
     * regular expression pattern specified
     * JavaScript conversion of code between <script> tags to Python dictionary
+2025/05/31 - Ralf A. Timmermann <ralf.timmermann@gmx.de>
+- version 2.3.0
+    * checks in main on output file and url
 """
 
 __author__ = "Dr. Ralf Antonius Timmermann"
@@ -47,10 +53,57 @@ __copyright__ = ("Copyright (c) 2024-25, Dr. Ralf Antonius Timmermann "
                  "All rights reserved.")
 __credits__ = []
 __license__ = "BSD 3-Clause"
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "ralf.timmermann@gmx.de"
 __status__ = "Prod"
+
+
+WDR3_URL_PATTERN = re.compile(r"https://www1\.wdr\.de/radio/wdr3(.)*$")
+
+
+class TestURL(BaseModel):
+    url: Annotated[str, StringConstraints(pattern=WDR3_URL_PATTERN)]
+
+
+def checks(
+        url: str,
+        filepath: str = "download.mp3"
+) -> None:
+    """
+    performs verious checks on url and file format and existance
+    :param url: url string
+    :param filepath: total file path
+    :return: None
+    """
+    try:
+        TestURL(url=url)
+        if not os.path.splitext(filepath)[1][1:] == "mp3":
+            raise NameError(filepath)
+        dirname = os.path.dirname(filepath)
+        if not dirname: dirname = '.'
+        regex = re.compile(
+            r"{}(\(\d\))?.mp3".format(
+                os.path.splitext(os.path.basename(filepath))[0]
+            )
+        )
+        if [file for file in os.listdir(dirname) if regex.match(file)]:
+            raise FileExistsError(filepath)
+
+        return
+
+    except ValidationError as e:
+        print("Error: {0} - {1} does not match pattern {2}".format(
+            repr(e.errors()[0]['type']),
+            url,
+            WDR3_URL_PATTERN.pattern
+        ))
+    except NameError as e:
+        print("Error: download filename '{}' is incorrect.".format(e))
+    except FileExistsError as e:
+        print("Error: download file '{}' exists. Exiting ...".format(e))
+
+    exit(1)
 
 
 def main():
@@ -64,10 +117,18 @@ def main():
         help='Output file (.mp3) (default: download.mp3)')
     parser.add_argument('url',
                         help='URL of web site where concert player resides')
+
+    pargs = parser.parse_args()
+
+    checks(
+        url=pargs.url,
+        filepath=pargs.output
+    )
+
     exit(
         wdr3_scraper(
-            url=parser.parse_args().url,
-            file=parser.parse_args().output
+            url=pargs.url,
+            filepath=pargs.output
         )
     )
 
