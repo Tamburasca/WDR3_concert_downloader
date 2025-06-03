@@ -1,13 +1,12 @@
 # WDR3 Concert Downloader
 
-Downloads audio mp3 files (@256 kbit/s) 
-from a WDR3 concert player website, if the concert 
+Downloads any audio mp3 files from a WDR3 concert player website, if the concert 
 is made available in the media library for a re-listening over a
 30-day period after its broadcast, hence, no download button
 is dispositional to the audience. 
 
 From the address bar of your web browser copy the url of the 
-website, where the concert resides and then execute the following command:
+website, where the concert resides and execute the following command:
 
     $ python3 WDR3_concert_downloader/ [-h] [-o <file>.mp3] <url>
 
