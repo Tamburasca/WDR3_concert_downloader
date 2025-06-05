@@ -28,7 +28,7 @@ size without having to install **ffmpeg** or an add-on for **sox** locally.
 Therefore, we created a
 [mp3 downsize script](https://github.com/Tamburasca/WDR3_concert_downloader/blob/master/src/mp3_downgrade.py)
 
-    $ python3 mp3_downgrade.py -f <factor> -i <file>.mp3 [-h] [-o <file>.mp3]
+    $ python3 src/mp3_downgrade.py -f <factor> -i <file>.mp3 [-h] [-o <file>.mp3]
 
 where a factor is to be supplied in the range [0.1, 1.0[ 
 that is multiplied with the bitrate of the 
