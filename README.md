@@ -1,9 +1,9 @@
 # WDR3 Concert Downloader
 
-Downloads any audio mp3 files from a WDR3 concert player website, if the concert 
-is made available in the media library for a re-listening over a
-30-day period after its broadcast, hence, no download button
-is dispositional to the audience. 
+Downloads any audio mp3 file detected on a WDR3 concert player website, 
+if the concert is available in the media library for a re-listening over a
+30-day period after its broadcast. This feature might be very useful, since 
+no mp3 file download button is dispositional to the audience.  
 
 From the address bar of your web browser copy the url of the 
 website, where the concert resides and execute the following command:
@@ -25,4 +25,12 @@ that creates a native audio file from a broadcaster's mp3 livestream.
 
 I found no way to downgrade the bitrate of the mp3 file to a smaller 
 size without having to install **ffmpeg** or an add-on for **sox** locally. 
-Suggestions welcome!
+Therefore, we created a
+[mp3 downsize script](https://github.com/Tamburasca/WDR3_concert_downloader/src/mp3_downgrade.py)
+
+    $ python3 mp3_downgrade.py -f <factor> -i <file>.mp3 [-h] [-o <file>.mp3]
+
+where a factor is to be supplied in the range [0.1, 1.0[ 
+that is multiplied with the bitrate of the 
+input file. Hence, the audio quality is downgraded, of course. 
+The output file is optional.

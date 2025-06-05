@@ -31,29 +31,13 @@ if importlib.util.find_spec("js2py_") is not None \
 else:
     from concert_downloader1 import wdr3_scraper
 
-"""
-version history:
-2024/08/18 - Ralf A. Timmermann <rtimmermann@astro.uni-bonn.de>
-- version 2.0.0
-    * scrape script for audioURL and extract via regExp
-2024/08/25 - Ralf A. Timmermann <rtimmermann@astro.uni-bonn.de>
-- version 2.1.0
-    * exit, if download file exists
-2025/05/26 - Ralf A. Timmermann <ralf.timmermann@gmx.de>
-- version 2.2.0
-    * regular expression pattern specified
-    * JavaScript conversion of code between <script> tags to Python dictionary
-2025/05/31 - Ralf A. Timmermann <ralf.timmermann@gmx.de>
-- version 2.3.0
-    * checks in main on output file and url
-"""
 
 __author__ = "Dr. Ralf Antonius Timmermann"
 __copyright__ = ("Copyright (c) 2024-25, Dr. Ralf Antonius Timmermann "
                  "All rights reserved.")
 __credits__ = []
 __license__ = "BSD 3-Clause"
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "ralf.timmermann@gmx.de"
 __status__ = "Prod"
@@ -106,7 +90,7 @@ def checks(
     exit(1)
 
 
-def main():
+def main() -> None:
     parser = ArgumentParser(
         description="Downloads audio mp3 files from WDR3 concert web sites.")
     parser.add_argument(
