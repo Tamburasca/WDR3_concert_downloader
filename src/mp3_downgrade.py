@@ -61,8 +61,8 @@ def downgrade(
         print(
             f"Input mp3-file '{input_file}' parameter:\n"
             f"Number of channels: {nchannels}\n"
-            f"Sample rate: {sample_rate}\n"
-            f"Bit rate: {bit_rate}\n"
+            f"Sample rate: {sample_rate} samples/second\n"
+            f"Bit rate: {bit_rate} kb/second\n"
             f"Layer: {decoder.get_layer()}\n"
             f"Mode: {decoder.get_mode()}\n"
         )
@@ -84,10 +84,6 @@ def downgrade(
           wave.open(memory_file) as wav_file):
         encoder = mp3.Encoder(write_file)
 
-        sample_size = wav_file.getsampwidth()
-        if sample_size != 2:
-            raise ValueError("Only PCM 16-bit sample size is supported "
-                             "(input audio: %s)" % sample_size)
         frame_rate = wav_file.getframerate()
         nchannels = wav_file.getnchannels()
         bit_rate = ceil(bit_rate * factor)
@@ -109,8 +105,8 @@ def downgrade(
         print(
             f"Output mp3-file '{output_file}' parameter:\n"
             f"Number of channels: {nchannels}\n"
-            f"Frame rate: {frame_rate}\n"
-            f"Bit rate: {bit_rate}\n"
+            f"Frame rate: {frame_rate} samples/second\n"
+            f"Bit rate: {bit_rate} kb/second\n"
             f"Mode: {mp3.MODE_STEREO 
             if nchannels == 2 else mp3.MODE_SINGLE_CHANNEL}"
         )
