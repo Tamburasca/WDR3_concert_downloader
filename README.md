@@ -25,12 +25,12 @@ that creates a native audio file from a broadcaster's mp3 livestream.
 
 I found no way to downgrade the bitrate of the mp3 file to a smaller 
 size without having to install **ffmpeg** or an add-on for **sox** locally. 
-Therefore, we created a
-[mp3 downsize script](https://github.com/Tamburasca/WDR3_concert_downloader/blob/master/src/mp3_downgrade.py)
+Hence, we created a mp3 downsize 
+[script](https://github.com/Tamburasca/WDR3_concert_downloader/blob/master/src/mp3_downgrade.py)
 
     $ python3 src/mp3_downgrade.py -f <factor> -i <file>.mp3 [-h] [-o <file>.mp3]
 
 where a factor is to be supplied in the range [0.1, 1.0[ 
 that is multiplied with the bitrate of the 
-input file. Hence, the audio quality is downgraded, of course. 
-The output file is optional.
+input file. Thus, the audio quality is downgraded. 
+The output file name is optional.

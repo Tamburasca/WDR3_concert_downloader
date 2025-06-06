@@ -11,7 +11,7 @@ https://github.com/miarec/pymp3
 import mp3
 import wave
 import os
-import re
+from re import compile, findall
 from io import BytesIO
 from argparse import ArgumentParser
 from typing import Generator
@@ -19,15 +19,14 @@ from math import ceil
 
 
 class Range(object):
+    __r = compile(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
+                  r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
     def __init__(self, scope: str):
-        r = re.compile(
-            r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
-            r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
         try:
-            i = list(re.findall(r, scope)[0])
+            i = list(findall(self.__r, scope)[0])
             if float(i[1]) >= float(i[2]): raise ArithmeticError
         except (IndexError, ArithmeticError):
-            raise SyntaxError("Error: incorrect range provided!")
+            raise SyntaxError("Range error: incorrect syntax!")
         self.__st = '{}{}, {}{}'.format(*i)
         i[0], i[3] = {'[': '<=', ']': '<'}[i[0]], {']': '<=', '[': '<'}[i[3]]
         self.__lambda = "lambda item: {1} {0} item {3} {2}".format(*i)
