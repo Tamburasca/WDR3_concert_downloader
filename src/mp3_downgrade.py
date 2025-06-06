@@ -22,13 +22,12 @@ class Range(object):
     def __init__(self, scope: str):
         r = re.compile(
             r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
-            r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$'
-        )
+            r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
         try:
             i = list(re.findall(r, scope)[0])
             if float(i[1]) >= float(i[2]): raise ArithmeticError
         except (IndexError, ArithmeticError):
-            raise SyntaxError("Error with the range provided!")
+            raise SyntaxError("Error: incorrect range provided!")
         self.__st = '{}{}, {}{}'.format(*i)
         i[0], i[3] = {'[': '<=', ']': '<'}[i[0]], {']': '<=', '[': '<'}[i[3]]
         self.__lambda = "lambda item: {1} {0} item {3} {2}".format(*i)
