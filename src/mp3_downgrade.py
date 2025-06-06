@@ -19,7 +19,6 @@ from math import ceil
 
 
 class Range(object):
-
     def __init__(self, scope: str):
         r = recomp(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
                    r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
