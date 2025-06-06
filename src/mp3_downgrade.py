@@ -11,7 +11,7 @@ https://github.com/miarec/pymp3
 import mp3
 import wave
 import os
-from re import compile as recomp, findall as refindall
+from re import compile, findall
 from io import BytesIO
 from argparse import ArgumentParser
 from typing import Generator
@@ -20,10 +20,10 @@ from math import ceil
 
 class Range(object):
     def __init__(self, scope: str):
-        r = recomp(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
-                   r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
+        r = compile(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
+                    r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
         try:
-            i = list(refindall(r, scope)[0])
+            i = list(findall(r, scope)[0])
             if float(i[1]) >= float(i[2]): raise ArithmeticError
         except (IndexError, ArithmeticError):
             raise SyntaxError("Range error: incorrect syntax!")
