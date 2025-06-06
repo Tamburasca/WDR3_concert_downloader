@@ -25,18 +25,14 @@ class Range(object):
             r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$'
         )
         try:
-            i = re.findall(r, scope)[0]
+            i = list(re.findall(r, scope)[0])
             if float(i[1]) >= float(i[2]): raise ArithmeticError
         except (IndexError, ArithmeticError):
             raise SyntaxError("Error with the range provided!")
         self.__st = '{}{}, {}{}'.format(*i)
-        self.__lamba = "lambda item: {} {} item {} {}".format(
-            i[1],
-            {'[': '<=', ']': '<'}[i[0]],
-            {']': '<=', '[': '<'}[i[3]],
-            i[2]
-        )
-    def __eq__(self, item: float) -> bool: return eval(self.__lamba)(item)
+        i[0], i[3] = {'[': '<=', ']': '<'}[i[0]], {']': '<=', '[': '<'}[i[3]]
+        self.__lambda = "lambda item: {1} {0} item {3} {2}".format(*i)
+    def __eq__(self, item: float) -> bool: return eval(self.__lambda)(item)
     def __contains__(self, item: float) -> bool: return self.__eq__(item)
     def __iter__(self) -> Generator[object, None, None]: yield self
     def __str__(self) -> str: return self.__st
