@@ -10,7 +10,7 @@ https://github.com/miarec/pymp3
 
 import mp3
 import wave
-import os
+from os import path
 from re import compile, findall
 from io import BytesIO
 from argparse import ArgumentParser
@@ -20,8 +20,8 @@ from math import ceil
 
 class Range(object):
     def __init__(self, scope: str):
-        r = compile(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
-                    r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
+        r = compile(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *,'
+                    r' *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
         try: i = list(findall(r, scope)[0])
         except IndexError: raise SyntaxError("Range error!")
         if float(i[1]) >= float(i[2]): raise ArithmeticError("Range error!")
@@ -78,7 +78,7 @@ def downgrade(
 
         frame_rate = wav_file.getframerate()
         nchannels = wav_file.getnchannels()
-        bit_rate = ceil(bit_rate * factor)
+        bit_rate: int = ceil(bit_rate * factor)  # must be integer
 
         encoder.set_bit_rate(bit_rate)
         encoder.set_sample_rate(frame_rate)
@@ -115,7 +115,7 @@ def main() -> None:
         required=True,
         help='Downgrade factor',
         type=float,
-        choices=Range('[0.1, 1.['),
+        choices=Range('[0.1 , 1['),
     )
     parser.add_argument(
         '-i',
@@ -129,7 +129,7 @@ def main() -> None:
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
     if parser.parse_args().output is None:
-        output_file = os.path.splitext(parser.parse_args().input)[0] \
+        output_file = path.splitext(parser.parse_args().input)[0] \
                       + "_down.mp3"
     else:
         output_file = parser.parse_args().output
