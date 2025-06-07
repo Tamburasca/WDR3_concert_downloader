@@ -20,14 +20,13 @@ from math import ceil
 
 class Range(object):
     def __init__(self, scope: str):
-        err = "Range error: incorrect syntax!"
         r = compile(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *'
                     r', *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
         try: i = list(findall(r, scope)[0])
-        except IndexError: raise SyntaxError(err)
-        if float(i[1]) >= float(i[2]): raise ArithmeticError(err)
+        except IndexError: raise SyntaxError("Range error!")
+        if float(i[1]) >= float(i[2]): raise ArithmeticError("Range error!")
         self.__st = '{}{}, {}{}'.format(*i)
-        i[0], i[3] = {'[': '<=', ']': '<'}[i[0]], {']': '<=', '[': '<'}[i[3]]
+        i[0], i[-1] = {'[': '<=', ']': '<'}[i[0]], {']': '<=', '[': '<'}[i[-1]]
         self.__lambda = "lambda item: {1} {0} item {3} {2}".format(*i)
     def __eq__(self, item: float) -> bool: return eval(self.__lambda)(item)
     def __contains__(self, item: float) -> bool: return self.__eq__(item)
