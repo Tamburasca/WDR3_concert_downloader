@@ -106,6 +106,11 @@ def downgrade(
     return 0
 
 
+def is_mp3(file: str) -> None:
+    if not file.endswith(".mp3"):
+        raise NameError("'{}' has no mp3 extention".format(file))
+
+
 def main() -> None:
     parser = ArgumentParser(
         description="Downgrades audio mp3 files from WDR3 concert web sites.")
@@ -115,7 +120,7 @@ def main() -> None:
         required=True,
         help='Downgrade factor',
         type=float,
-        choices=Range('[0.1 , 1['),
+        choices=Range('[0.1, 1['),
     )
     parser.add_argument(
         '-i',
@@ -128,16 +133,19 @@ def main() -> None:
         nargs='?',
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
+    input_file = parser.parse_args().input
+    is_mp3(input_file)
+
     if parser.parse_args().output is None:
-        output_file = path.splitext(parser.parse_args().input)[0] \
-                      + "_down.mp3"
+        output_file = path.splitext(input_file)[0] + "_down.mp3"
     else:
         output_file = parser.parse_args().output
+        is_mp3(output_file)
 
     exit(
         downgrade(
             factor=parser.parse_args().factor,
-            input_file=parser.parse_args().input,
+            input_file=input_file,
             output_file=output_file
         ))
 
