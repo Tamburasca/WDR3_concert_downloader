@@ -13,7 +13,7 @@ import wave
 from os import path
 from re import compile, findall
 from io import BytesIO
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 from typing import Generator
 from math import ceil
 
@@ -33,6 +33,17 @@ class Range(object):
     def __iter__(self) -> Generator[object, None, None]: yield self
     def __str__(self) -> str: return self.__st
     def __repr__(self) -> str: return self.__str__()
+
+
+class Validator(object):
+    def __init__(self, pattern):
+        self._pattern = compile(pattern)
+
+    def __call__(self, value):
+        if not self._pattern.match(value):
+            raise ArgumentTypeError(
+                "Argument has to match '{}'".format(self._pattern.pattern))
+        return value
 
 
 def downgrade(
@@ -106,13 +117,8 @@ def downgrade(
     return 0
 
 
-def is_mp3(file: str) -> None:
-    if not file.endswith(".mp3"):
-        print("Error: '{}' has no mp3 extention".format(file))
-        exit(1)
-
-
 def main() -> None:
+    mp3_extention = Validator(r"^.*\.mp3$")
     parser = ArgumentParser(
         description="Downgrades audio mp3 files from WDR3 concert web sites.")
     parser.add_argument(
@@ -127,21 +133,20 @@ def main() -> None:
         '-i',
         '--input',
         required=True,
+        type=mp3_extention,
         help='Input file (.mp3)')
     parser.add_argument(
         '-o',
         '--output',
+        type=mp3_extention,
         nargs='?',
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
     input_file = parser.parse_args().input
-    is_mp3(input_file)
-
     if parser.parse_args().output is None:
         output_file = path.splitext(input_file)[0] + "_down.mp3"
     else:
         output_file = parser.parse_args().output
-        is_mp3(output_file)
 
     exit(
         downgrade(
