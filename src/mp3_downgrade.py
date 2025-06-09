@@ -108,7 +108,8 @@ def downgrade(
 
 def is_mp3(file: str) -> None:
     if not file.endswith(".mp3"):
-        raise NameError("'{}' has no mp3 extention".format(file))
+        print("Error: '{}' has no mp3 extention".format(file))
+        exit(1)
 
 
 def main() -> None:
