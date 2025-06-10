@@ -36,13 +36,10 @@ class Range(object):
 
 
 class Validator(object):
-    def __init__(self, pattern):
-        self._pattern = compile(pattern)
-
-    def __call__(self, value):
-        if not self._pattern.match(value):
-            raise ArgumentTypeError(
-                "Argument has to match '{}'".format(self._pattern.pattern))
+    def __init__(self, pattern: str): self._pattern = compile(pattern)
+    def __call__(self, value: str) -> str:
+        if not self._pattern.match(value): raise ArgumentTypeError(
+            "Argument does not match RegEx '{}'".format(self._pattern.pattern))
         return value
 
 
@@ -118,7 +115,6 @@ def downgrade(
 
 
 def main() -> None:
-    mp3_extention = Validator(r"^.*\.mp3$")
     parser = ArgumentParser(
         description="Downgrades audio mp3 files from WDR3 concert web sites.")
     parser.add_argument(
@@ -133,12 +129,12 @@ def main() -> None:
         '-i',
         '--input',
         required=True,
-        type=mp3_extention,
+        type=Validator(r"^.*\.mp3$"),
         help='Input file (.mp3)')
     parser.add_argument(
         '-o',
         '--output',
-        type=mp3_extention,
+        type=Validator(r"^.*\.mp3$"),
         nargs='?',
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
