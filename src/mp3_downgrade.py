@@ -20,8 +20,8 @@ from math import ceil
 
 class Range(object):
     def __init__(self, scope: str):
-        r = compile(r'^([\[\]]) *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *,'
-                    r' *([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?) *([\[\]])$')
+        b, f = r"([\[\]])", r"([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?)"
+        r = compile(f'^{{{0}}} *{{{1}}} *, *{{{1}}} *{{{0}}}$'.format(b,f))
         try: i = list(findall(r, scope)[0])
         except IndexError: raise SyntaxError("Range error!")
         if float(i[1]) >= float(i[2]): raise ArithmeticError("Range error!")
