@@ -21,7 +21,7 @@ from math import ceil
 class Range(object):
     def __init__(self, scope: str):
         b, f = r"([\[\]])", r"([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?)"
-        r = compile(f'^{{{0}}} *{{{1}}} *, *{{{1}}} *{{{0}}}$'.format(b,f))
+        r = compile(f'^{{{0}}} ?{{{1}}} ?, ?{{{1}}} ?{{{0}}}$'.format(b,f))
         try: i = list(findall(r, scope)[0])
         except IndexError: raise SyntaxError("Range error!")
         if float(i[1]) >= float(i[2]): raise ArithmeticError("Range error!")
@@ -129,12 +129,12 @@ def main() -> None:
         '-i',
         '--input',
         required=True,
-        type=Validator(r"^.*\.mp3$"),
+        type=Validator(r"^.+\.mp3$"),
         help='Input file (.mp3)')
     parser.add_argument(
         '-o',
         '--output',
-        type=Validator(r"^.*\.mp3$"),
+        type=Validator(r"^.+\.mp3$"),
         nargs='?',
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
