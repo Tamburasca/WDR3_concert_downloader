@@ -21,7 +21,7 @@ from math import ceil
 class Range(object):
     def __init__(self, scope: str):
         b, f = r"([\[\]])", r"([-+]?(?:\d*\.\d+|\d+\.?)(?:[Ee][+-]?\d+)?)"
-        r = compile(f'^{{{0}}} ?{{{1}}} ?, ?{{{1}}} ?{{{0}}}$'.format(b,f))
+        r = compile(f'^{b} ?{f} ?, ?{f} ?{b}$')
         try: i = list(findall(r, scope)[0])
         except IndexError: raise SyntaxError("Range error!")
         if float(i[1]) >= float(i[2]): raise ArithmeticError("Range error!")
@@ -59,7 +59,7 @@ def downgrade(
         nchannels = decoder.get_channels()
         bit_rate = decoder.get_bit_rate()
         print(
-            f"Input mp3-file '{input_file}' parameter:\n"
+            f"Input file '{input_file}' parameter:\n"
             f"Number of channels: {nchannels}\n"
             f"Sample rate: {sample_rate} samples/second\n"
             f"Bit rate: {bit_rate} kb/second\n"
@@ -103,7 +103,7 @@ def downgrade(
                 encoder.flush()
                 break
         print(
-            f"Output mp3-file '{output_file}' parameter:\n"
+            f"Output file '{output_file}' parameter:\n"
             f"Number of channels: {nchannels}\n"
             f"Frame rate: {frame_rate} samples/second\n"
             f"Bit rate: {bit_rate} kb/second\n"
