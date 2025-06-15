@@ -39,10 +39,13 @@ class Validator(object):
     def __init__(self, pattern: str): self._pattern = compile(pattern)
     def __call__(self, value: str) -> str:
         if not self._pattern.match(value):
-            print("\033[91mError: argument does not match RegEx '{}'\033[00m"
+            print_red("Error: argument does not match RegEx '{}'"
                   .format(self._pattern.pattern))
             exit(1)
         return value
+
+
+def print_red(text: str) -> None: print("\033[91m{}\033[00m".format(text))
 
 
 def downgrade(
@@ -147,7 +150,7 @@ def main() -> None:
     else:
         output_file = parser.parse_args().output
         if output_file == input_file:
-            print("\033[91mError: output file equals input file.\033[00m")
+            print_red("Error: output file equals input file.")
             exit(1)
 
     exit(
