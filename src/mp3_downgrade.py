@@ -13,7 +13,7 @@ import wave
 from os import path
 from re import compile, findall
 from io import BytesIO
-from argparse import ArgumentParser, ArgumentTypeError
+from argparse import ArgumentParser
 from typing import Generator
 from math import ceil
 
@@ -38,8 +38,10 @@ class Range(object):
 class Validator(object):
     def __init__(self, pattern: str): self._pattern = compile(pattern)
     def __call__(self, value: str) -> str:
-        if not self._pattern.match(value): raise ArgumentTypeError(
-            "Argument does not match RegEx '{}'".format(self._pattern.pattern))
+        if not self._pattern.match(value):
+            print("\033[91mError: argument does not match RegEx '{}'\033[00m"
+                  .format(self._pattern.pattern))
+            exit(1)
         return value
 
 
@@ -115,6 +117,7 @@ def downgrade(
 
 
 def main() -> None:
+    mp3_validator = Validator(r"^.+\.mp3$")
     parser = ArgumentParser(
         description="Downgrades audio mp3 files from WDR3 concert web sites.")
     parser.add_argument(
@@ -129,12 +132,12 @@ def main() -> None:
         '-i',
         '--input',
         required=True,
-        type=Validator(r"^.+\.mp3$"),
+        type=mp3_validator,
         help='Input file (.mp3)')
     parser.add_argument(
         '-o',
         '--output',
-        type=Validator(r"^.+\.mp3$"),
+        type=mp3_validator,
         nargs='?',
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
@@ -143,6 +146,9 @@ def main() -> None:
         output_file = path.splitext(input_file)[0] + "_down.mp3"
     else:
         output_file = parser.parse_args().output
+        if output_file == input_file:
+            print("\033[91mError: output file equals input file.\033[00m")
+            exit(1)
 
     exit(
         downgrade(
