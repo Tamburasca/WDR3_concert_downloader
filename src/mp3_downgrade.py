@@ -41,11 +41,12 @@ class Validator(object):
         if not self._pattern.match(value):
             print_red("Error: argument does not match RegEx '{}'"
                   .format(self._pattern.pattern))
-            exit(1)
         return value
 
 
-def print_red(text: str) -> None: print("\033[91m{}\033[00m".format(text))
+def print_red(text: str) -> None:
+    print("\033[91m{}\033[00m".format(text))
+    exit(1)
 
 
 def downgrade(
@@ -151,7 +152,6 @@ def main() -> None:
         output_file = parser.parse_args().output
         if output_file == input_file:
             print_red("Error: output file equals input file.")
-            exit(1)
 
     exit(
         downgrade(
