@@ -39,12 +39,12 @@ class Validator(object):
     def __init__(self, pattern: str): self._pattern = compile(pattern)
     def __call__(self, value: str) -> str:
         if not self._pattern.match(value):
-            print_red("Error: argument does not match RegEx '{}'"
+            print_error("Error: argument does not match RegEx '{}'"
                   .format(self._pattern.pattern))
         return value
 
 
-def print_red(text: str) -> None:
+def print_error(text: str) -> None:
     print("\033[91m{}\033[00m".format(text))
     exit(1)
 
@@ -130,7 +130,7 @@ def main() -> None:
         required=True,
         help='Downgrade factor',
         type=float,
-        choices=Range('[0.1, 1['),
+        choices=Range('[0.1, 1[')
     )
     parser.add_argument(
         '-i',
@@ -146,12 +146,14 @@ def main() -> None:
         help='Output file (.mp3) (default=<input_file>_down.mp3)')
 
     input_file = parser.parse_args().input
+    if not path.isfile(input_file):
+        print_error("Error: input file '{}' does not exist.".format(input_file))
     if parser.parse_args().output is None:
         output_file = path.splitext(input_file)[0] + "_down.mp3"
     else:
         output_file = parser.parse_args().output
         if output_file == input_file:
-            print_red("Error: output file equals input file.")
+            print_error("Error: output file equals input file.")
 
     exit(
         downgrade(
