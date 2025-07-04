@@ -41,13 +41,13 @@ def wdr3_scraper(
 
         # extract content within script tags which matches regEx
         for script in soup.find_all('script', text=PATTERN):
-            # js_dict is js2py_.base.JsObjectWrapper, not dict, object !
+            # js_dict is js2py_.base.JsObjectWrapper, not dict, it's an object!
             js_dict = js2py_.eval_js(JS_PREFIX + script.string + JS_SUFFIX)
             mp3_url = js_dict['mediaResource']['dflt']['audioURL']
 
             if mp3_url:
                 file_download = \
-                    filepath if counter == 0 else "{0}({1}).mp3".format(
+                    filepath if counter == 0 else "{0}_{1}.mp3".format(
                         filepath.rsplit(".", 1)[0],
                         counter
                     )

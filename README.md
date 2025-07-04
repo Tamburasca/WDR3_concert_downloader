@@ -14,9 +14,10 @@ where e.g.
 url = https://www1.wdr.de/radio/wdr3/programm/sendungen/wdr3-konzert/konzertplayer-klassik-tage-alter-musik-in-herne-concerto-romano-alessandro-quarta-100.html
 
 Note: if multiple mp3 media objects are available on the website provided,
-all files will be downloaded and named according the scheme
-file.mp3, file(1).mp3, file(2).mp3, etc. in the order the objects are 
-encountered in the html soup scan.
+all files will be downloaded in the order the objects are 
+encountered in the html soup scan. The naming of the downloaded files follows 
+the scheme file.mp3 and file_n.mp3, n being the consecutive number, starting 
+at 1.
 
 Note: this downloader is not supported by the WDR broadcasting organization, 
 thus is inofficial! The current application supplements 

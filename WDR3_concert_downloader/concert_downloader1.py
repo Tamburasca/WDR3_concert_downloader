@@ -32,7 +32,7 @@ def wdr3_scraper(
 
             if mp3_url:
                 file_download = \
-                    filepath if counter == 0 else "{0}({1}).mp3".format(
+                    filepath if counter == 0 else "{0}_{1}.mp3".format(
                         filepath.rsplit(".", 1)[0],
                         counter
                     )
