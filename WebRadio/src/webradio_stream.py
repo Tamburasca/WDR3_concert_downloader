@@ -17,8 +17,8 @@ ICY_BYTES_BLOCK_SIZE = 16  # bytes
 ZERO_BYTE = b"\0"
 
 PATH = "/app/data/"
-# for testing define environment variable MP3_PATH
-if v := os.getenv("MP3_PATH"): PATH = v
+# for testing define environment variable MP3_DIR
+if v := os.getenv("MP3_DIR"): PATH = v
 
 
 class RingMemory(object):
