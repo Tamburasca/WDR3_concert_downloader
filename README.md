@@ -36,9 +36,12 @@ that is multiplied with the bitrate of the
 input file. Thus, the audio quality is downgraded. 
 The output file name is optional.
 
-A Webradio Server based on FastAPI is presented in a Docker container that 
-streams all collected mp3-files. The files need to be made available in a 
-directory that is specified in *.env*, the files are selected randomly. This is
-a first draft. Text as "metadata" can be injected between the byte stream chunks 
+Furthermore, in a first draft, we provide 
+a Webradio Server based on FastAPI presented in a Docker container that 
+streams a collection of mp3-files. 
+The files need to be made available in a 
+directory specified in *.env*, where the files are selected randomly, when the 
+method is invoked by the web radio client. 
+Text as "metadata" can be injected between the byte stream chunks 
 by toggling an event flag (yet tbd). In the present case we inject mp3-metadata
-at hand with the mp3-files.
+present in the mp3-files, such as title, album and genre. 
