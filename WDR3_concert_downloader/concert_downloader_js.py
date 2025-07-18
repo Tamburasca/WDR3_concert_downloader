@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding: utf-8
 
 """
 this is an alternative solution for the concert_download1.py module
@@ -7,11 +6,11 @@ see for conversion from JavaScript to Python 3.13
 https://github.com/PiotrDabkowski/Js2Py
 """
 
-import requests
 import re
-import js2py_  # ECMA 6 support is still experimental, check for final development
-from bs4 import BeautifulSoup
 
+import js2py_  # ECMA 6 support is still experimental, check for final development
+import requests
+from bs4 import BeautifulSoup
 
 PATTERN = re.compile(r'"audioURL"\s?:\s?"(.*\.mp3)"')
 # Javascript definitions and supplements

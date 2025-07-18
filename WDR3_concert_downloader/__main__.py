@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding: utf-8
 
 """
 Downloads mp3 files from a site where the WDR3 concert player is located if
@@ -21,8 +20,10 @@ import os.path
 import re
 from argparse import ArgumentParser
 from sys import exit
-from pydantic import BaseModel, ValidationError, StringConstraints
 from typing import Annotated
+
+from pydantic import BaseModel, ValidationError, StringConstraints
+
 if importlib.util.find_spec("js2py_") is not None \
         and os.path.isfile("{}/concert_downloader_js.py".format(
     os.path.dirname(os.path.realpath(__file__)))
@@ -30,7 +31,6 @@ if importlib.util.find_spec("js2py_") is not None \
     from concert_downloader_js import wdr3_scraper
 else:
     from concert_downloader1 import wdr3_scraper
-
 
 __author__ = "Dr. Ralf Antonius Timmermann"
 __copyright__ = ("Copyright (c) 2024-25, Dr. Ralf Antonius Timmermann "
@@ -41,7 +41,6 @@ __version__ = "2.4.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "ralf.timmermann@gmx.de"
 __status__ = "Prod"
-
 
 WDR3_URL_PATTERN = re.compile(r"https://www1\.wdr\.de/radio/wdr3(.)*$")
 

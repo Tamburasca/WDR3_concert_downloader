@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Downgrade the quality of a mp3 input file for a smaller sized output file.
 A mp3 input file is read and converted to a wav file stored temporily in memory,
@@ -8,14 +10,15 @@ We utilized a template provided by
 https://github.com/miarec/pymp3
 """
 
-import mp3
 import wave
+from argparse import ArgumentParser
+from io import BytesIO
+from math import ceil
 from os import path
 from re import compile, findall
-from io import BytesIO
-from argparse import ArgumentParser
 from typing import Generator
-from math import ceil
+
+import mp3
 
 
 class Range(object):
@@ -161,7 +164,3 @@ def main() -> None:
             input_file=input_file,
             output_file=output_file
         ))
-
-
-if __name__ == '__main__':
-    main()

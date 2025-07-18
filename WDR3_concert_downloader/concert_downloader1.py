@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-# coding: utf-8
+
+import re
 
 import requests
-import re
 from bs4 import BeautifulSoup
-
 
 PATTERN = re.compile(r'"audioURL"\s?:\s?"(.*\.mp3)"')
 

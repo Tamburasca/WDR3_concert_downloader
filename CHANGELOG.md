@@ -6,6 +6,15 @@
 ### Deprecated
 ### Removed
 ### Security
+## 2.5.0 (2025-07-18)
+### Added
+- Webradio Server for mp3 streams provided in Docker container
+### Changed
+- sript rearraged starting __main__
+### Fixed
+### Deprecated
+### Removed
+### Security
 ## 2.4.0 (2025-06-05)
 ### Added
 - script provided to downsize the mp3 file
