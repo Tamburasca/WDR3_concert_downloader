@@ -8,7 +8,6 @@ import random
 import time
 from typing import Generator, Iterator
 
-import uvicorn
 from fastapi import FastAPI, HTTPException, Request  # Header,
 from fastapi.responses import StreamingResponse
 from tinytag import TinyTag
@@ -18,7 +17,8 @@ ICY_BYTES_BLOCK_SIZE = 16  # bytes
 ZERO_BYTE = b"\0"
 
 PATH = "/app/data/"
-# PATH = "/home/ralf/WDR3_mp3/"  # for testing with PyCharm
+# for testing define environment variable MP3_PATH
+if v := os.getenv("MP3_PATH"): PATH = v
 
 
 class RingMemory(object):
@@ -86,7 +86,7 @@ def header(
 
 def preprocess_metadata(
         metadata: str = "META_EVENT"
-) -> Generator[bytes, None, None]:
+) -> bytes:
     icy_metadata_formatted = f"StreamTitle='{metadata}';".encode()
     icy_metadata_block_length = len(icy_metadata_formatted)
     return (
@@ -207,6 +207,8 @@ async def post_mp3_file(request: Request):
 
 
 def main() -> None:
+    import uvicorn
+
     config = {
         "host": "0.0.0.0",
         "port": 5010,
@@ -216,7 +218,3 @@ def main() -> None:
     uvicorn.run(app=app,
                 **config,
                 )
-
-
-if __name__ == '__main__':
-    main()

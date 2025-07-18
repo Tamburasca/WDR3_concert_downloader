@@ -12,6 +12,4 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
     rm -f requirements.txt
 
-# command to run on container start
-# python [-u] forces the stdout and stderr streams to be unbuffered.
-CMD ["python3", "-u", "src/webradio_stream.py"]
+CMD ["uvicorn", "src.webradio_stream:app", "--host", "0.0.0.0", "--port", "5010", "--timeout-keep-alive", "60"]
