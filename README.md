@@ -1,6 +1,6 @@
 # WDR3 Concert Downloader
 
-Downloads any audio mp3 file detected on a WDR3 concert player website, 
+Downloads any audio mp3 file encountered on a WDR3 concert player website, 
 if the concert is available in the media library for a re-listening over a
 30-day period after its broadcast. This feature might be very useful, since 
 no mp3 file download button is dispositional to the audience.  
@@ -36,12 +36,11 @@ that is multiplied with the bitrate of the
 input file. Thus, the audio quality is downgraded. 
 The output file name is optional.
 
-Furthermore, in a first draft, we provide 
-a Webradio Server based on FastAPI presented in a Docker container that 
-streams a collection of mp3-files. 
+Furthermore, in a first draft, we provide a Webradio Server based on FastAPI.
+Running in a Docker container it streams a collection of mp3-files.
 The files need to be made available in a 
-directory specified in *.env*, where the files are selected randomly, when the 
+directory specified in *.env*. and are selected randomly, when the 
 method is invoked by the web radio client. 
-Text as "metadata" can be injected between the byte stream chunks 
-by toggling an event flag (yet tbd). In the present case we inject mp3-metadata
+Text as "metadata" is injected between the byte stream chunks. 
+In the present case we inject mp3-metadata
 present in the mp3-files, such as title, album and genre. 

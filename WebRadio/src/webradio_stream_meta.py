@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 
-# see also for the template
+# see also for guidance
 # https://stackoverflow.com/questions/79142077/how-to-send-icy-format-message-in-audio-stream-from-server-in-python
 
 import os
 import random
 import time
+from queue import Queue
+from threading import Thread, Event
 from typing import Generator, Iterator
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import StreamingResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 from tinytag import TinyTag
 
-ICY_METADATA_INTERVAL = 8 * 1024  # bytes
+ICY_METADATA_INTERVAL = 16 * 1024  # bytes
 ICY_BYTES_BLOCK_SIZE = 16  # bytes
 ZERO_BYTE = b"\0"
+TIME_INJECT = 60  # metadata injects in seconds
 
-PATH = "/app/data/"
+evts = list()  # list of threads, queues, and events
+
+PATH = "/app/data/"  # where the mp3 reside
 # for testing define environment variable MP3_DIR
 if p := os.getenv("MP3_DIR"): PATH = p
 
@@ -39,6 +46,9 @@ class RingMemory(object):
             # reset iterator and provide first element
             self._iter = iter(self._files)
             return next(self._iter)
+
+
+eternal_iterator: RingMemory = RingMemory()
 
 
 def mp3_metadata(
@@ -64,6 +74,7 @@ def mp3_metadata(
         "duration": tag.duration,  # audio duration in seconds as float
         "samplerate": tag.samplerate  # samples per second as integer
     }
+
     return {
         k: v for k, v in metadata.items() if v is not None
     }
@@ -88,9 +99,30 @@ def header(
         'icy-public': '0',
         'icy-url': 'https://github.com/Tamburasca/WDR3_concert_downloader'
     }
+
     return {
         k: v for k, v in head.items() if v is not None
     }
+
+
+def injector(
+        q: Queue,
+        event: Event,
+        msg: str
+) -> None:
+    i = 0  # count up for demoing
+    while True:
+        if event.is_set(): break
+        if q.empty():
+            # print("put:", msg + "_" + str(i))
+            q.put(msg + "_" + str(i))
+            i += 1
+        time.sleep(TIME_INJECT)
+    # clean up the queue
+    if not q.empty():  # there should be only one item in the queue
+        q.get_nowait()
+        q.task_done()
+    print("Stopping previous thread ... killing the zombie!")
 
 
 def preprocess_metadata(
@@ -101,40 +133,96 @@ def preprocess_metadata(
     if -(icy_metadata_block_length // -ICY_BYTES_BLOCK_SIZE) > 255:
         raise RuntimeError
     r = (
-        # number of blocks of ICY_BYTES_BLOCK_SIZE needed for this meta message (NOT including this byte), ceil notation
-            (-(icy_metadata_block_length // -ICY_BYTES_BLOCK_SIZE)).to_bytes(1, byteorder="big")
-        # meta message encoded
+        # number of blocks of ICY_BYTES_BLOCK_SIZE needed for this meta message
+        # (NOT including this byte), ceil notation
+            (-(icy_metadata_block_length //
+               -ICY_BYTES_BLOCK_SIZE)).to_bytes(1, byteorder="big")
+            # meta message encoded
             + icy_metadata_formatted
-        # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
-            + (ICY_BYTES_BLOCK_SIZE - icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE) % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE
+            # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
+            + (ICY_BYTES_BLOCK_SIZE -
+               icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE)
+            % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE
     )
+    # print(r)  # for testing
     return r
 
 
 def iterfile_mod(
         path: str,
+        request_headers: Request.headers = None,
         msg: str = "",
-        flag: bool = False
+        bitrate: float = None,
+        flag: bool = False,
 ) -> Generator[bytes, None, None]:
-    event = True  # ToDo: enable toggle via queue to change titles, and merge Iterfile() functions
+    q: Queue = None
+
+    if flag:
+        q = Queue()
+        event = Event()
+        t = Thread(
+            target=injector,
+            # daemon=True,  # we will join anyway
+            args=(q, event, msg,))
+        t.start()
+
+        for item in evts:
+            print(item)
+        for v in filter(lambda person: person['client'] ==
+                                       request_headers['user-agent'], evts):
+            v['event'].set()
+            if not v['thread'].is_alive():
+                v['thread'].join()
+                v['queue'].join()
+                # delete all inactive instances
+                del v['event']
+                del v['queue']
+                del v['thread']
+                evts.remove(v)  # remove old items from list
+        evts.append(
+            {
+                'client': request_headers['user-agent'],
+                'thread': t,
+                'queue': q,
+                'event': event
+            })
+
+    retention = ICY_METADATA_INTERVAL / (bitrate * 1000 / 8)
+    correction = 0.
+    t_total = 0.
+
     with open(path, mode="rb") as mp3_stream:
+        t_start = time.time()
         while chunk := mp3_stream.read(ICY_METADATA_INTERVAL):
             yield chunk
             if flag:
-                if event:
-                    event = False
-                    yield preprocess_metadata(msg)
-                else:
+                if q.empty():
                     yield ZERO_BYTE
+                else:  # get a special signal we can send some metadata
+                    msg = q.get_nowait()
+                    q.task_done()
+                    yield preprocess_metadata(msg)
+                time.sleep(retention - correction)
+                t_total += retention
+                # next one to consider
+                correction = time.time() - t_start - t_total
+                # print(time.time() - t_start, tot)
     print("End of method reached, last message: ", msg)
 
 
-eternal_iterator: RingMemory = RingMemory()
-app: FastAPI = FastAPI()
+app: FastAPI = FastAPI(
+    docs_url=None,
+    redoc_url=None
+)
+app.mount(
+    "/img",
+    StaticFiles(directory="img"),
+    name="img"
+)
 
 
 @app.get(path="/api/webradio")
-async def post_media_file(request: Request):
+async def post_media_stream(request: Request):
     request_headers = request.headers
     print("/api/webradio caller: ", request_headers)
     flag_icy_metadata = False
@@ -162,8 +250,10 @@ async def post_media_file(request: Request):
             return StreamingResponse(
                 iterfile_mod(
                     path=PATH + item,
+                    request_headers=request.headers,
                     msg=msg,
-                    flag=flag_icy_metadata
+                    bitrate=meta.get('bitrate'),
+                    flag=flag_icy_metadata,
                 ),
                 media_type="audio/mpeg",
                 headers=headers
@@ -180,36 +270,18 @@ async def post_media_file(request: Request):
             detail=str(e))
 
 
-# this method is going to be deprecated
-@app.get(path="/api/mp3")
-async def post_mp3_file(request: Request):
-    print("/api/mp3 caller", request.headers)
+@app.get("/docs", include_in_schema=False)
+def overridden_swagger():
+    return get_swagger_ui_html(openapi_url="/openapi.json",
+                               title="Ralf's Webradio",
+                               swagger_favicon_url="/img/favicon.png")
 
-    try:
-        while True:
-            item = next(eternal_iterator)
-            meta = mp3_metadata(filepath=PATH + item)
-            print("metadata: {}".format(meta))
-            print("{0} Currently playing: {1}"
-                  .format(time.asctime(time.localtime()),
-                          item))
-            return StreamingResponse(
-                iterfile_mod(
-                    path=PATH + item
-                ),
-                media_type="audio/mpeg",
-                headers=header(meta=meta)
-            )
 
-    except StopIteration:
-        raise HTTPException(
-            status_code=404,
-            detail="No streamable item available.")
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=404,
-            detail=str(e))
+@app.get("/redoc", include_in_schema=False)
+def overridden_redoc():
+    return get_redoc_html(openapi_url="/openapi.json",
+                          title="Ralf's Webradio",
+                          redoc_favicon_url="/img/favicon.ico")
 
 
 @app.get(path="/", include_in_schema=False)
@@ -224,8 +296,9 @@ def main() -> None:
 
     config = {
         "host": "0.0.0.0",
-        "port": 5010
+        "port": 5011  # Testing environment
     }
+
     # kick off Asynchronous Server Gateway Interface (ASGI) webserver
     uvicorn.run(app=app,
                 **config,

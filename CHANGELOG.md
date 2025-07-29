@@ -8,7 +8,8 @@
 ### Security
 ## 2.5.0 (2025-07-18)
 ### Added
-- Webradio Server for mp3 streams provided in Docker container
+- Webradio Server for mp3 streams provided in Docker container.
+- Metadata is injected at regular times.
 ### Changed
 - sript rearraged starting __main__
 ### Fixed
