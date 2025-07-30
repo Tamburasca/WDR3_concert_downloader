@@ -214,7 +214,8 @@ def iterfile_mod(
 
 app: FastAPI = FastAPI(
     docs_url=None,
-    redoc_url=None
+    redoc_url=None,
+    title="Internetradio Web Server"
 )
 app.mount(
     path="/img",
@@ -223,7 +224,7 @@ app.mount(
 )
 
 
-@app.get(path="/api/webradio")
+@app.get(path="/api/webradio", tags=[""])
 async def post_media_stream(request: Request):
     request_headers = request.headers
     print("/api/webradio caller: ", request_headers)
@@ -274,14 +275,14 @@ async def post_media_stream(request: Request):
 
 @app.get("/docs", include_in_schema=False)
 def overridden_swagger():
-    return get_swagger_ui_html(openapi_url="/openapi.json",
+    return get_swagger_ui_html(openapi_url=app.openapi_url,
                                title="Ralf's Webradio",
                                swagger_favicon_url="/img/favicon.png")
 
 
 @app.get("/redoc", include_in_schema=False)
 def overridden_redoc():
-    return get_redoc_html(openapi_url="/openapi.json",
+    return get_redoc_html(openapi_url=app.openapi_url,
                           title="Ralf's Webradio",
                           redoc_favicon_url="/img/favicon.png")
 
@@ -303,7 +304,8 @@ def main() -> None:
 
     config = {
         "host": "0.0.0.0",
-        "port": 5011  # Testing environment
+        "port": 5011,  # Testing environment
+        # "log_level": "debug"
     }
 
     # kick off Asynchronous Server Gateway Interface (ASGI) webserver
