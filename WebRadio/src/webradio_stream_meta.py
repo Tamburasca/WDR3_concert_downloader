@@ -12,7 +12,7 @@ from typing import Generator, Iterator
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
-from fastapi.responses import StreamingResponse, PlainTextResponse
+from fastapi.responses import StreamingResponse, PlainTextResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from tinytag import TinyTag
 
@@ -191,7 +191,9 @@ def iterfile_mod(
     correction = 0.
     t_total = 0.
 
-    with open(path, mode="rb") as mp3_stream:
+    with open(
+            file=path,
+            mode="rb") as mp3_stream:
         t_start = time.time()
         while chunk := mp3_stream.read(ICY_METADATA_INTERVAL):
             yield chunk
@@ -201,7 +203,7 @@ def iterfile_mod(
                 else:  # get a special signal we can send some metadata
                     msg = q.get_nowait()
                     q.task_done()
-                    yield preprocess_metadata(msg)
+                    yield preprocess_metadata(metadata=msg)
                 time.sleep(retention - correction)
                 t_total += retention
                 # next one to consider
@@ -215,8 +217,8 @@ app: FastAPI = FastAPI(
     redoc_url=None
 )
 app.mount(
-    "/img",
-    StaticFiles(directory="img"),
+    path="/img",
+    app=StaticFiles(directory="img"),
     name="img"
 )
 
@@ -248,7 +250,7 @@ async def post_media_stream(request: Request):
                 headers['icy-metaint'] = str(ICY_METADATA_INTERVAL)
 
             return StreamingResponse(
-                iterfile_mod(
+                content=iterfile_mod(
                     path=PATH + item,
                     request_headers=request.headers,
                     msg=msg,
@@ -281,7 +283,12 @@ def overridden_swagger():
 def overridden_redoc():
     return get_redoc_html(openapi_url="/openapi.json",
                           title="Ralf's Webradio",
-                          redoc_favicon_url="/img/favicon.ico")
+                          redoc_favicon_url="/img/favicon.png")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse("/img/favicon.png")
 
 
 @app.get(path="/", include_in_schema=False)

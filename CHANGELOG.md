@@ -6,6 +6,15 @@
 ### Deprecated
 ### Removed
 ### Security
+## 2.5.1 (2025-07-30)
+### Added
+### Changed
+### Fixed
+- small corrections
+- favicon.ico as method 
+### Deprecated
+### Removed
+### Security
 ## 2.5.0 (2025-07-18)
 ### Added
 - Webradio Server for mp3 streams provided in Docker container.
