@@ -13,7 +13,6 @@ from typing import Generator, Iterator
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import StreamingResponse, PlainTextResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from tinytag import TinyTag
 
 ICY_METADATA_INTERVAL = 16 * 1024  # bytes
@@ -21,11 +20,13 @@ ICY_BYTES_BLOCK_SIZE = 16  # bytes
 ZERO_BYTE = b"\0"
 TIME_INJECT = 60  # metadata injects in seconds
 
-evts = list()  # list of threads, queues, and events
-
+SOURCE_PATH = os.path.dirname(os.path.abspath(__file__))
+FAVICON_ICO = f"{SOURCE_PATH}/../img/favicon.png"
 PATH = "/app/data/"  # where the mp3 reside
 # for testing define environment variable MP3_DIR
 if p := os.getenv("MP3_DIR"): PATH = p
+
+evts = list()  # list of threads, queues, and events
 
 
 class RingMemory(object):
@@ -65,7 +66,7 @@ def mp3_metadata(
         "disc_total": tag.disc_total,  # total number of discs as integer
         "genre": tag.genre,  # genre as string
         "title": tag.title  # title of track as string, mp3-filename otherwise
-            if tag.title else os.path.basename(filepath).rstrip(".mp3"),
+        if tag.title else os.path.basename(filepath).rstrip(".mp3"),
         "track": tag.track,  # track number as integer
         "track_total": tag.track_total,  # total number of tracks as integer
         "year": tag.year,  # year or date as string
@@ -144,7 +145,7 @@ def preprocess_metadata(
                 icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE)
                % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE)
     )
-    # print(r)  # for testing
+
     return r
 
 
@@ -217,11 +218,6 @@ app: FastAPI = FastAPI(
     redoc_url=None,
     title="Internetradio Web Server"
 )
-#app.mount(
-#    path="/img",
-#    app=StaticFiles(directory="img"),
-#    name="img"
-#)
 
 
 @app.get(
@@ -280,19 +276,19 @@ async def post_media_stream(request: Request):
 def overridden_swagger():
     return get_swagger_ui_html(openapi_url=app.openapi_url,
                                title="Ralf's Webradio",
-                               swagger_favicon_url="img/favicon.png")
+                               swagger_favicon_url="/favicon.ico")
 
 
 @app.get("/redoc", include_in_schema=False)
 def overridden_redoc():
     return get_redoc_html(openapi_url=app.openapi_url,
                           title="Ralf's Webradio",
-                          redoc_favicon_url="img/favicon.png")
+                          redoc_favicon_url="/favicon.ico")
 
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
-    return FileResponse("img/favicon.png")
+    return FileResponse(FAVICON_ICO)
 
 
 @app.get(path="/", include_in_schema=False)
@@ -308,7 +304,7 @@ def main() -> None:
     config = {
         "host": "0.0.0.0",
         "port": 5011,  # Testing environment
-        # "log_level": "debug"
+        "log_level": "debug"
     }
 
     # kick off Asynchronous Server Gateway Interface (ASGI) webserver
