@@ -272,6 +272,11 @@ async def post_media_stream(request: Request):
             detail=str(e))
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse(FAVICON_ICO)
+
+
 @app.get("/docs", include_in_schema=False)
 def overridden_swagger():
     return get_swagger_ui_html(openapi_url=app.openapi_url,
@@ -284,11 +289,6 @@ def overridden_redoc():
     return get_redoc_html(openapi_url=app.openapi_url,
                           title="Ralf's Webradio",
                           redoc_favicon_url="/favicon.ico")
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-def favicon():
-    return FileResponse(FAVICON_ICO)
 
 
 @app.get(path="/", include_in_schema=False)
