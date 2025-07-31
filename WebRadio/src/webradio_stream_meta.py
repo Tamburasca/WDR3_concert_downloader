@@ -217,11 +217,11 @@ app: FastAPI = FastAPI(
     redoc_url=None,
     title="Internetradio Web Server"
 )
-app.mount(
-    path="/img",
-    app=StaticFiles(directory="img"),
-    name="img"
-)
+#app.mount(
+#    path="/img",
+#    app=StaticFiles(directory="img"),
+#    name="img"
+#)
 
 
 @app.get(
@@ -280,14 +280,14 @@ async def post_media_stream(request: Request):
 def overridden_swagger():
     return get_swagger_ui_html(openapi_url=app.openapi_url,
                                title="Ralf's Webradio",
-                               swagger_favicon_url="/img/favicon.png")
+                               swagger_favicon_url="img/favicon.png")
 
 
 @app.get("/redoc", include_in_schema=False)
 def overridden_redoc():
     return get_redoc_html(openapi_url=app.openapi_url,
                           title="Ralf's Webradio",
-                          redoc_favicon_url="/img/favicon.png")
+                          redoc_favicon_url="img/favicon.png")
 
 
 @app.get("/favicon.ico", include_in_schema=False)
