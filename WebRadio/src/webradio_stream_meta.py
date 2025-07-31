@@ -140,9 +140,9 @@ def preprocess_metadata(
             # meta message encoded
             + icy_metadata_formatted
             # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
-            + (ICY_BYTES_BLOCK_SIZE -
-               icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE)
-            % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE
+            + ((ICY_BYTES_BLOCK_SIZE -
+                icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE)
+               % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE)
     )
     # print(r)  # for testing
     return r
@@ -224,7 +224,10 @@ app.mount(
 )
 
 
-@app.get(path="/api/webradio", tags=[""])
+@app.get(
+    path="/api/webradio",
+    tags=[""],
+    name="Streaming A Collection Of MP3-Files Randomly")
 async def post_media_stream(request: Request):
     request_headers = request.headers
     print("/api/webradio caller: ", request_headers)
@@ -289,7 +292,7 @@ def overridden_redoc():
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
-    return FileResponse("/img/favicon.png")
+    return FileResponse("img/favicon.png")
 
 
 @app.get(path="/", include_in_schema=False)
