@@ -205,7 +205,12 @@ def iterfile_mod(
                     msg = q.get_nowait()
                     q.task_done()
                     yield preprocess_metadata(metadata=msg)
-                time.sleep(retention - correction)
+                try:
+                    time.sleep(retention - correction)
+                # if streaming is discontinued, sleep value may become negative
+                # for the very last yield
+                except ValueError:
+                    break
                 t_total += retention
                 # next one to consider
                 correction = time.time() - t_start - t_total
