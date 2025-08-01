@@ -85,20 +85,20 @@ def header(
         meta: dict
 ) -> dict:
     head = {
-        'content-type': 'audio/mpeg',
-        'Pragma': 'no-cache',
-        'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate',
-        'Connection': 'Close, close',
-        'icy-br': str(meta.get('bitrate')),
-        'icy-samplerate': str(meta.get('samplerate')),
-        'icy-description': 'album: {} - artist: {}'.format(
-            meta.get('album', 'unknown'),
-            meta.get('artist', 'unknown')
+        "content-type": "audio/mpeg",
+        "Pragma": "no-cache",
+        "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
+        "Connection": "Close, close",
+        "icy-br": str(meta.get('bitrate')),
+        "icy-samplerate": str(meta.get('samplerate')),
+        "icy-description": "Album: {} - Artist: {}".format(
+            meta.get('album', "unknown"),
+            meta.get('artist', "unknown")
         ),
-        'icy-genre': meta.get('genre', 'unknown'),
-        'icy-name': meta.get('title', 'unknown'),
-        'icy-public': '0',
-        'icy-url': 'https://github.com/Tamburasca/WDR3_concert_downloader'
+        "icy-genre": "Genre: {}".format(meta.get('genre', "unknown")),
+        "icy-name": meta.get('title', "unknown"),
+        "icy-public": "0",
+        "icy-url": "https://github.com/Tamburasca/WDR3_concert_downloader"
     }
 
     return {
@@ -241,7 +241,7 @@ async def post_media_stream(request: Request):
             item = next(eternal_iterator)
             meta = mp3_metadata(filepath=PATH + item)
             print("metadata: {}".format(meta))
-            msg = "{} - {} - {}".format(
+            msg = "Title: {} - Album: {} - Artist: {}".format(
                 meta.get('title', "unknown"),
                 meta.get('album', "unknown"),
                 meta.get('artist', "unknown")
