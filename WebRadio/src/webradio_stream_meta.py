@@ -214,7 +214,7 @@ def iterfile_mod(
                 t_total += retention
                 # next one to consider
                 correction = time.time() - t_start - t_total
-                # print(time.time() - t_start, tot)
+                # print(time.time() - t_start, t_total)
     print("End of method reached, last message: ", msg)
 
 

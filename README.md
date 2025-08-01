@@ -36,11 +36,13 @@ that is multiplied with the bitrate of the
 input file. Thus, the audio quality is downgraded. 
 The output file name is optional.
 
-Furthermore, in a first draft, we provide a Webradio Server based on FastAPI.
+Furthermore, in a first draft, we provide an Internet Radio on a web server 
+that is based on FastAPI utilizing its Streaming Response.
 Running in a Docker container it streams a collection of mp3-files.
 The files need to be made available in a 
 directory specified in *.env*. and are selected randomly, when the 
-method is invoked by the web radio client. 
-Text as "metadata" is injected between the byte stream chunks. 
-In the present case we inject mp3-metadata
+method is invoked by the client. 
+Text as "metadata" is injected between the byte stream chunks, if the client
+reveals 'icy-metadata' = '1' in its request header.
+For the time being we inject mp3-metadata
 present in the mp3-files, such as title, album and genre. 
