@@ -43,6 +43,6 @@ The files need to be made available in a
 directory specified in *.env*. and are selected randomly, when the 
 method is invoked by the client. 
 Text as "metadata" is injected between the byte stream chunks, if the client
-reveals 'icy-metadata' = '1' in its request header.
+reveals *icy-metadata* = '1' in its request header.
 For the time being we inject mp3-metadata
 present in the mp3-files, such as title, album and genre. 
