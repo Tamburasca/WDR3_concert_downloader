@@ -36,13 +36,12 @@ that is multiplied with the bitrate of the
 input file. Thus, the audio quality is downgraded. 
 The output file name is optional.
 
-Furthermore, in a first draft, we provide an Internet Radio on a web server 
-that is based on FastAPI utilizing its Streaming Response.
-Running in a Docker container it streams a collection of mp3-files.
-The files need to be made available in a 
-directory specified in *.env*. and are selected randomly, when the 
-method is invoked by the client. 
+Furthermore, in a first draft, we provide an Internet Radio on a 
+web server based on FastAPI utilizing its Streaming Response.
+Running in a Docker container it streams mp3-files that are provided
+in a directory as specified in *.env*. Each time the client 
+invokes the method another mp3 file is streamed - randomly.
 Text as "metadata" is injected between the byte stream chunks, if the client
-reveals *icy-metadata* = '1' in its request header.
-For the time being we inject mp3-metadata
-present in the mp3-files, such as title, album and genre. 
+exposes the attribute *icy-metadata* = '1' in its request header.
+For the time being we utilize metadata of the mp3-files that 
+comprise title, album and genre.
