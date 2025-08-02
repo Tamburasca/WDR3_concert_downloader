@@ -37,10 +37,9 @@ input file. Thus, the audio quality is downgraded.
 The output file name is optional.
 
 Furthermore, in a first draft, we provide an Internet Radio on a 
-web server based on FastAPI utilizing its Streaming Response.
+web server based on FastAPI utilizing its *StreamingResponse*.
 Running in a Docker container it streams mp3-files that are provided
-in a directory as specified in *.env*. Each time the client 
-invokes the method another mp3 file is streamed - randomly.
+in a directory as specified in *.env* - one after another, randomly selected.
 Text as "metadata" is injected between the byte stream chunks, if the client
 exposes the attribute *icy-metadata* = '1' in its request header.
 For the time being we utilize metadata of the mp3-files that 

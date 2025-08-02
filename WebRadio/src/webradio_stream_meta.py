@@ -22,11 +22,11 @@ TIME_INJECT = 60  # metadata injects in seconds
 
 SOURCE_PATH = os.path.dirname(os.path.abspath(__file__))
 FAVICON_ICO = f"{SOURCE_PATH}/../img/favicon.png"
-PATH = "/app/data/"  # where the mp3 reside
-# for testing define environment variable MP3_DIR
+PATH = "/app/data/"  # where the mp3 reside inside docker
+# for testing define environment variable MP3_DIR to overwrite
 if p := os.getenv("MP3_DIR"): PATH = p
 
-evts = list()  # list of threads, queues, and events
+evts = list()  # list of threads, queues, and events for cleansing
 
 
 class RingMemory(object):
@@ -119,8 +119,8 @@ def injector(
             q.put(msg + "_" + str(i))
             i += 1
         time.sleep(TIME_INJECT)
-    # clean up the queue
-    if not q.empty():  # there should be only one item in the queue
+    # clean up the queue, there should be only one item left
+    if not q.empty():
         q.get_nowait()
         q.task_done()
     print("Stopping previous thread ... killing the zombie!")
