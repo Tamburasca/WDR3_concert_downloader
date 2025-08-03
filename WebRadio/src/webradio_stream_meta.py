@@ -71,7 +71,7 @@ def mp3_metadata(
         "track_total": tag.track_total,  # total number of tracks as integer
         "year": tag.year,  # year or date as string
         "bitdepth": tag.bitdepth,  # bitdepth as integer (for lossless audio)
-        "bitrate": tag.bitrate,  # bitrate in kBits/s as float
+        "bitrate": round(tag.bitrate),  # bitrate in kBits/s as float
         "duration": tag.duration,  # audio duration in seconds as float
         "samplerate": tag.samplerate  # samples per second as integer
     }
@@ -88,7 +88,8 @@ def header(
         "content-type": "audio/mpeg",
         "Pragma": "no-cache",
         "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
-        "Connection": "Close, close",
+        "Connection": "keep-alive", # "Close, close",
+        "Transfer-Encoding": "chunked",
         "icy-br": str(meta.get('bitrate')),
         "icy-samplerate": str(meta.get('samplerate')),
         "icy-description": "Album: {} - Artist: {}".format(
@@ -212,7 +213,6 @@ def iterfile_mod(
                 except ValueError:
                     break
                 t_total += retention
-                # next one to consider
                 correction = time.time() - t_start - t_total
                 # print(time.time() - t_start, t_total)
     print("End of method reached, last message: ", msg)
