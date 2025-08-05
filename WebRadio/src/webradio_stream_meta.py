@@ -13,6 +13,7 @@ from typing import Generator, Iterator
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import StreamingResponse, PlainTextResponse, FileResponse
+from starlette.datastructures import Headers
 from tinytag import TinyTag
 
 ICY_METADATA_INTERVAL = 16 * 1024  # bytes
@@ -26,16 +27,15 @@ PATH = "/app/data/"  # where the mp3 reside inside docker
 # for testing define environment variable MP3_DIR to overwrite
 if p := os.getenv("MP3_DIR"): PATH = p
 
-evts = list()  # list of threads, queues, and events for cleansing
+evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 
 class RingMemory(object):
     def __init__(self):
-        files = [f for f in os.listdir(PATH)
-                 if os.path.isfile(PATH + f) and f.endswith(".mp3")]
-        random.shuffle(files)
-        self._files = files
-        self._iter = iter(self._files)
+        self.__files = [f for f in os.listdir(PATH)
+                        if os.path.isfile(PATH + f) and f.endswith(".mp3")]
+        random.shuffle(self.__files)
+        self._iter = iter(self.__files)
 
     def __iter__(self) -> Iterator[object]:
         return self
@@ -45,7 +45,7 @@ class RingMemory(object):
             return next(self._iter)
         except StopIteration:
             # reset iterator and provide first element
-            self._iter = iter(self._files)
+            self._iter = iter(self.__files)
             return next(self._iter)
 
 
@@ -88,7 +88,7 @@ def header(
         "content-type": "audio/mpeg",
         "Pragma": "no-cache",
         "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
-        "Connection": "Close, close", # "keep-alive",
+        "Connection": "Close, close", # "Keep-Alive",
         "Transfer-Encoding": "chunked",
         "icy-br": str(meta.get('bitrate')),
         "icy-samplerate": str(meta.get('samplerate')),
@@ -124,7 +124,7 @@ def injector(
     if not q.empty():
         q.get_nowait()
         q.task_done()
-    print("Stopping previous thread ... killing the zombie!")
+    print("Stopping thread ... killing the zombie!")
 
 
 def preprocess_metadata(
@@ -152,7 +152,7 @@ def preprocess_metadata(
 
 def iterfile_mod(
         path: str,
-        request_headers: Request.headers = None,
+        request_headers: Headers = None,
         msg: str = "",
         bitrate: float = None,
         flag: bool = False,
@@ -168,6 +168,8 @@ def iterfile_mod(
             args=(q, event, msg,))
         t.start()
 
+        if evts:
+            print("Items in thread list (Event: 'is set' will be deleted):")
         for item in evts:
             print(item)
         for v in filter(lambda person: person['client'] ==
