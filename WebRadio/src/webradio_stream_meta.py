@@ -88,7 +88,7 @@ def header(
         "content-type": "audio/mpeg",
         "Pragma": "no-cache",
         "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
-        "Connection": "keep-alive", # "Close, close",
+        "Connection": "Close, close", # "keep-alive",
         "Transfer-Encoding": "chunked",
         "icy-br": str(meta.get('bitrate')),
         "icy-samplerate": str(meta.get('samplerate')),
