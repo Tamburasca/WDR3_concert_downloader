@@ -94,9 +94,10 @@ def header(
         meta: dict
 ) -> dict:
     """
-    Server header for the streaming response.
-    This is the header that will be sent to the client.
-    It contains the metadata of the mp3 file that are not None.
+    Server header for the streaming response. This is the header that will be
+    sent to the client. If 'icy-metadata' == '1' is received from the client,
+    the response header comprises headers['icy-metaint'] = ICY_METADATA_INTERVAL
+    as well.
     :param meta:
     :return:
     """
@@ -130,13 +131,13 @@ def injector(
 ) -> None:
     """
     Injector thread that puts a message into the queue every TIME_INJECT seconds.
-    This is used to inject metadata into the stream.
-    The thread will stop when the event is set.
-    The queue will be cleaned up at the end of the thread.
+    This is used to inject metadata into the stream, i.e. StreamTitle
+    The thread will stop when the event is set. The queue will be cleaned up
+    at the end of the thread.
     :param q:
     :param event:
     :param msg:
-    :return:
+    :return: None
     """
     i = 0  # count up for demoing
     while True:
@@ -201,7 +202,11 @@ def iterfile_mod(
     :param msg:
     :param bitrate:
     :param flag:
-    :return:
+    :return: Iterator[bytes]
+    :raises RuntimeError: if the number of blocks exceeds 255
+    :raises ValueError: if the retention time becomes negative, i.e.
+    discontinues the byte stream
+    :raises HTTPException: if the file is not found or any other error occurs
     """
     q: Queue = None
 
