@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# see also for guidance
-# https://stackoverflow.com/questions/79142077/how-to-send-icy-format-message-in-audio-stream-from-server-in-python
-
 import os
 import random
 import time
@@ -31,6 +28,12 @@ evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 
 class RingMemory(object):
+    """
+    Ring memory iterator for the mp3 files in the given path.
+    It shuffles the files and provides an eternal iterator that will
+    return the next file in the list. When the end of the list is reached,
+    it will return the first file again.
+    """
     def __init__(self):
         self.__files = [f for f in os.listdir(PATH)
                         if os.path.isfile(PATH + f) and f.endswith(".mp3")]
@@ -55,6 +58,12 @@ eternal_iterator: RingMemory = RingMemory()
 def mp3_metadata(
         filepath: str
 ) -> dict:
+    """
+    Metadata extraction from mp3 file using TinyTag.
+    Returns a dictionary with metadata fields that are not None.
+    :param filepath:
+    :return:
+    """
     tag: TinyTag = TinyTag.get(filename=filepath)
     metadata = {
         "album": tag.album,  # album as string
@@ -84,6 +93,13 @@ def mp3_metadata(
 def header(
         meta: dict
 ) -> dict:
+    """
+    Server header for the streaming response.
+    This is the header that will be sent to the client.
+    It contains the metadata of the mp3 file that are not None.
+    :param meta:
+    :return:
+    """
     head = {
         "content-type": "audio/mpeg",
         "Pragma": "no-cache",
@@ -112,6 +128,16 @@ def injector(
         event: Event,
         msg: str
 ) -> None:
+    """
+    Injector thread that puts a message into the queue every TIME_INJECT seconds.
+    This is used to inject metadata into the stream.
+    The thread will stop when the event is set.
+    The queue will be cleaned up at the end of the thread.
+    :param q:
+    :param event:
+    :param msg:
+    :return:
+    """
     i = 0  # count up for demoing
     while True:
         if event.is_set(): break
@@ -130,18 +156,27 @@ def injector(
 def preprocess_metadata(
         metadata: str = "META_EVENT"
 ) -> bytes:
+    """
+    Preprocess metadata for ICY format.
+    This function formats the metadata string into the ICY format
+    and returns it as bytes.
+    See also for guidance
+    https://stackoverflow.com/questions/79142077/how-to-send-icy-format-message-in-audio-stream-from-server-in-python
+    :param metadata:
+    :return:
+    """
     icy_metadata_formatted = f"StreamTitle='{metadata}';".encode()
     icy_metadata_block_length = len(icy_metadata_formatted)
-    if -(icy_metadata_block_length // -ICY_BYTES_BLOCK_SIZE) > 255:
+    icy_no_blocks = -(-icy_metadata_block_length // ICY_BYTES_BLOCK_SIZE)
+    if icy_no_blocks > 255:
         raise RuntimeError
     r = (
         # number of blocks of ICY_BYTES_BLOCK_SIZE needed for this meta message
         # (NOT including this byte), ceil notation
-            (-(icy_metadata_block_length //
-               -ICY_BYTES_BLOCK_SIZE)).to_bytes(1, byteorder="big")
-            # meta message encoded
+            icy_no_blocks.to_bytes(1, byteorder="big")
+        # meta message encoded
             + icy_metadata_formatted
-            # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
+        # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
             + ((ICY_BYTES_BLOCK_SIZE -
                 icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE)
                % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE)
@@ -157,6 +192,17 @@ def iterfile_mod(
         bitrate: float = None,
         flag: bool = False,
 ) -> Generator[bytes, None, None]:
+    """
+    Generator that yields chunks of the mp3 file. If the flag is set, it will
+    also yield metadata. The stream is delayed by a retention time, depending on
+    the bitrate and the ICY_METADATA_INTERVAL.
+    :param path:
+    :param request_headers:
+    :param msg:
+    :param bitrate:
+    :param flag:
+    :return:
+    """
     q: Queue = None
 
     if flag:
