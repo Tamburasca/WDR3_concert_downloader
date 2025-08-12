@@ -163,7 +163,7 @@ def preprocess_metadata(
     and returns it as bytes.
     See also for guidance
     https://stackoverflow.com/questions/79142077/how-to-send-icy-format-message-in-audio-stream-from-server-in-python
-    :param metadata:
+    :param metadata: string to be published
     :return:
     """
     icy_metadata_formatted = f"StreamTitle='{metadata}';".encode()
@@ -191,26 +191,24 @@ def iterfile_mod(
         request_headers: Headers = None,
         msg: str = "",
         bitrate: float = None,
-        flag: bool = False,
 ) -> Generator[bytes, None, None]:
     """
     Generator that yields chunks of the mp3 file. If the flag is set, it will
     also yield metadata. The stream is delayed by a retention time, depending on
     the bitrate and the ICY_METADATA_INTERVAL.
-    :param path:
-    :param request_headers:
-    :param msg:
-    :param bitrate:
-    :param flag:
-    :return: Iterator[bytes]
+    :param path: path to the mp3 file
+    :param request_headers: headers of the request, used to identify the client
+    :param msg: msg to be injected into the stream
+    :param bitrate: bitrate of the mp3 file in kBits/s
+    :return: Iterator[bytes] for StreamingResponse
     :raises RuntimeError: if the number of blocks exceeds 255
-    :raises ValueError: if the retention time becomes negative, i.e.
-    discontinues the byte stream
+    :raises ValueError: if the retention time - in case the stream is paused
+    by the client - becomes negative, i.e. discontinues the byte stream
     :raises HTTPException: if the file is not found or any other error occurs
     """
     q: Queue = None
 
-    if flag:
+    if flag := request_headers.get('icy-metadata') == '1':
         q = Queue()
         event = Event()
         t = Thread(
@@ -250,8 +248,10 @@ def iterfile_mod(
             file=path,
             mode="rb") as mp3_stream:
         t_start = time.time()
+
         while chunk := mp3_stream.read(ICY_METADATA_INTERVAL):
             yield chunk
+
             if flag:
                 if q.empty():
                     yield ZERO_BYTE
@@ -285,9 +285,6 @@ app: FastAPI = FastAPI(
 async def post_media_stream(request: Request):
     request_headers = request.headers
     print("/api/webradio caller: ", request_headers)
-    flag_icy_metadata = False
-    if request_headers.get('icy-metadata', '0') == '1':
-        flag_icy_metadata = True
 
     try:
         while True:
@@ -303,7 +300,7 @@ async def post_media_stream(request: Request):
                   .format(time.asctime(time.localtime()),
                           item))
             headers: dict = header(meta=meta)
-            if flag_icy_metadata:
+            if request_headers.get('icy-metadata') == '1':
                 # enhance headers by ICY_METADATA_INTERVAL
                 headers['icy-metaint'] = str(ICY_METADATA_INTERVAL)
 
@@ -312,8 +309,7 @@ async def post_media_stream(request: Request):
                     path=PATH + item,
                     request_headers=request.headers,
                     msg=msg,
-                    bitrate=meta.get('bitrate'),
-                    flag=flag_icy_metadata,
+                    bitrate=meta.get('bitrate')
                 ),
                 media_type="audio/mpeg",
                 headers=headers
