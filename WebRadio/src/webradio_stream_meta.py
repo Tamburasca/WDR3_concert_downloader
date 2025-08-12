@@ -213,7 +213,6 @@ def iterfile_mod(
         event = Event()
         t = Thread(
             target=injector,
-            # daemon=True,  # we will join anyway
             args=(q, event, msg,))
         t.start()
 
@@ -309,11 +308,9 @@ async def post_media_stream(request: Request):
                     path=PATH + item,
                     request_headers=request.headers,
                     msg=msg,
-                    bitrate=meta.get('bitrate')
-                ),
+                    bitrate=meta.get('bitrate')),
                 media_type="audio/mpeg",
-                headers=headers
-            )
+                headers=headers)
 
     except StopIteration:
         raise HTTPException(
