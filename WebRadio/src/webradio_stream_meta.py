@@ -178,9 +178,8 @@ def preprocess_metadata(
         # meta message encoded
             + icy_metadata_formatted
         # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
-            + ((ICY_BYTES_BLOCK_SIZE -
-                icy_metadata_block_length % ICY_BYTES_BLOCK_SIZE)
-               % ICY_BYTES_BLOCK_SIZE * ZERO_BYTE)
+            + (icy_no_blocks * ICY_BYTES_BLOCK_SIZE - icy_metadata_block_length)
+            * ZERO_BYTE
     )
 
     return r
