@@ -33,7 +33,6 @@ def endless_generator(iterable) -> Iterator[Any]:
     :param iterable: an iterable object
     :return: an endless iterator over the iterable
     :raises TypeError: if the iterable is not an iterable object
-    :raises RuntimeError: if the iterable is empty
     """
     while True:
         for i in iterable:
@@ -45,10 +44,12 @@ def file_shuffle() -> list:
     Shuffle the mp3 files in the PATH directory and return a list of file paths.
     :return: list of shuffled mp3 files
     :raises FileNotFoundError: if the PATH directory does not exist or is empty
-    :raises RuntimeError: if no mp3 files are found in the PATH directory
     """
     mp3_files = [PATH + f for f in os.listdir(PATH)
                  if os.path.isfile(PATH + f) and f.endswith(".mp3")]
+    if not mp3_files:
+        raise FileNotFoundError(
+            f"No mp3 files found in the directory: {PATH}")
     return random.sample(mp3_files, len(mp3_files))
 
 
