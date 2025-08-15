@@ -32,16 +32,28 @@ def endless_generator(iterable) -> Iterator[Any]:
     Endless generator that yields items from the iterable indefinitely.
     :param iterable: an iterable object
     :return: an endless iterator over the iterable
+    :raises TypeError: if the iterable is not an iterable object
+    :raises RuntimeError: if the iterable is empty
     """
     while True:
         for i in iterable:
             yield i
 
 
-mp3_files = [PATH + f for f in os.listdir(PATH)
-             if os.path.isfile(PATH + f) and f.endswith(".mp3")]
-random.shuffle(mp3_files)
-eternal_iterator: Iterator[Any] = endless_generator(mp3_files)
+def file_shuffle() -> list:
+    """
+    Shuffle the mp3 files in the PATH directory and return a list of file paths.
+    :return: list of shuffled mp3 files
+    :raises FileNotFoundError: if the PATH directory does not exist or is empty
+    :raises RuntimeError: if no mp3 files are found in the PATH directory
+    """
+    mp3_files = [PATH + f for f in os.listdir(PATH)
+                 if os.path.isfile(PATH + f) and f.endswith(".mp3")]
+    random.shuffle(mp3_files)
+    return mp3_files
+
+
+eternal_iterator: Iterator[Any] = endless_generator(file_shuffle())
 
 
 def mp3_metadata(
