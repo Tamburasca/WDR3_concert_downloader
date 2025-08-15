@@ -5,7 +5,7 @@ import random
 import time
 from queue import Queue
 from threading import Thread, Event
-from typing import Generator, Iterator
+from typing import Generator, Iterator, Any
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
@@ -27,32 +27,21 @@ if p := os.getenv("MP3_DIR"): PATH = p
 evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 
-class RingMemory(object):
+def endless_generator(iterable) -> Iterator[Any]:
     """
-    Ring memory iterator for the mp3 files in the given path.
-    It shuffles the files and provides an eternal iterator that will
-    return the next file in the list. When the end of the list is reached,
-    it will return the first file again.
+    Endless generator that yields items from the iterable indefinitely.
+    :param iterable: an iterable object
+    :return: an endless iterator over the iterable
     """
-    def __init__(self):
-        self.__files = [f for f in os.listdir(PATH)
-                        if os.path.isfile(PATH + f) and f.endswith(".mp3")]
-        random.shuffle(self.__files)
-        self._iter = iter(self.__files)
-
-    def __iter__(self) -> Iterator[object]:
-        return self
-
-    def __next__(self) -> str:
-        try:
-            return next(self._iter)
-        except StopIteration:
-            # reset iterator and provide first element
-            self._iter = iter(self.__files)
-            return next(self._iter)
+    while True:
+        for i in iterable:
+            yield i
 
 
-eternal_iterator: RingMemory = RingMemory()
+mp3_files = [PATH + f for f in os.listdir(PATH)
+             if os.path.isfile(PATH + f) and f.endswith(".mp3")]
+random.shuffle(mp3_files)
+eternal_iterator: Iterator[Any] = endless_generator(mp3_files)
 
 
 def mp3_metadata(
@@ -127,7 +116,7 @@ def header(
 def injector(
         q: Queue,
         event: Event,
-        msg: str
+        msg: list
 ) -> None:
     """
     Injector thread that puts a message into the queue every TIME_INJECT seconds.
@@ -139,13 +128,11 @@ def injector(
     :param msg:
     :return: None
     """
-    i = 0  # count up for demoing
+    streaming_title: Iterator[Any] = endless_generator(msg)
     while True:
         if event.is_set(): break
         if q.empty():
-            # print("put:", msg + "_" + str(i))
-            q.put(msg + "_" + str(i))
-            i += 1
+            q.put(next(streaming_title))
         time.sleep(TIME_INJECT)
     # clean up the queue, there should be only one item left
     if not q.empty():
@@ -188,7 +175,7 @@ def preprocess_metadata(
 def iterfile_mod(
         path: str,
         request_headers: Headers = None,
-        msg: str = "",
+        msg: list = None,
         bitrate: float = None,
 ) -> Generator[bytes, None, None]:
     """
@@ -230,7 +217,7 @@ def iterfile_mod(
                 del v['queue']
                 del v['thread']
                 evts.remove(v)  # remove old items from list
-        evts.append(
+        evts.append(  # append current thread, queue and event
             {
                 'client': request_headers['user-agent'],
                 'thread': t,
@@ -254,19 +241,19 @@ def iterfile_mod(
                 if q.empty():
                     yield ZERO_BYTE
                 else:  # get a special signal we can send some metadata
-                    msg = q.get_nowait()
+                    streaming_title = q.get_nowait()
                     q.task_done()
-                    yield preprocess_metadata(metadata=msg)
+                    yield preprocess_metadata(metadata=streaming_title)
                 try:
                     time.sleep(retention - correction)
-                # if streaming is discontinued, sleep value may become negative
-                # for the very last yield
+                # if streaming is discontinued, sleep argument may become
+                # negative for last yield
                 except ValueError:
                     break
                 t_total += retention
                 correction = time.time() - t_start - t_total
                 # print(time.time() - t_start, t_total)
-    print("End of method reached, last message: ", msg)
+    print(f"End of method reached for: {request_headers['user-agent']}")
 
 
 app: FastAPI = FastAPI(
@@ -287,13 +274,13 @@ async def post_media_stream(request: Request):
     try:
         while True:
             item = next(eternal_iterator)
-            meta = mp3_metadata(filepath=PATH + item)
+            meta = mp3_metadata(filepath=item)
             print("metadata: {}".format(meta))
-            msg = "Title: {} - Album: {} - Artist: {}".format(
-                meta.get('title', "unknown"),
-                meta.get('album', "unknown"),
-                meta.get('artist', "unknown")
-            )
+            msg = [
+                f"Title: {meta.get('title', "unknown")}",
+                f"Album: {meta.get('album', "unknown")}",
+                f"Artist: {meta.get('artist', "unknown")}"
+            ]
             print("{0} Currently playing: {1}"
                   .format(time.asctime(time.localtime()),
                           item))
@@ -304,7 +291,7 @@ async def post_media_stream(request: Request):
 
             return StreamingResponse(
                 content=iterfile_mod(
-                    path=PATH + item,
+                    path=item,
                     request_headers=request.headers,
                     msg=msg,
                     bitrate=meta.get('bitrate')),

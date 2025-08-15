@@ -9,7 +9,7 @@ with open("requirements.txt", "r") as f:
 
 setuptools.setup(
     name="WDR3 Concert Downloader",
-    version="2.5.1",
+    version="2.6.0",
     author="Dr. Ralf Antonius Timmermann",
     author_email="rtimmermann@gmx.de",
     description="Download appropriate mp3 to file, where's no download button",

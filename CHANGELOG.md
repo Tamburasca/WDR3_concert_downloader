@@ -6,6 +6,15 @@
 ### Deprecated
 ### Removed
 ### Security
+## 2.6.0 (2025-08-15)
+### Added
+### Changed
+- modified endless iterator
+- Streaming title displaying title, author, and album subsequently 
+### Fixed
+### Deprecated
+### Removed
+### Security
 ## 2.5.1 (2025-07-30)
 ### Added
 ### Changed
