@@ -49,8 +49,7 @@ def file_shuffle() -> list:
     """
     mp3_files = [PATH + f for f in os.listdir(PATH)
                  if os.path.isfile(PATH + f) and f.endswith(".mp3")]
-    random.shuffle(mp3_files)
-    return mp3_files
+    return random.sample(mp3_files, len(mp3_files))
 
 
 eternal_iterator: Iterator[Any] = endless_generator(file_shuffle())
