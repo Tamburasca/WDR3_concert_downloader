@@ -27,7 +27,7 @@ if p := os.getenv("MP3_DIR"): PATH = p
 evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 
-def endless_generator(iterable) -> Iterator[Any]:
+def endless_generator(iterable: list[str]) -> Iterator[Any]:
     """
     Endless generator that yields items from the iterable indefinitely.
     :param iterable: an iterable object
