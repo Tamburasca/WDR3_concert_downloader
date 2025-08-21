@@ -41,6 +41,7 @@ web server based on FastAPI utilizing its *StreamingResponse*.
 Running in a Docker container it streams mp3-files that are provided
 in a directory as specified in *.env* - one after another, randomly selected.
 Text as "metadata" is injected between the byte stream chunks, if the client
-exposes the attribute *icy-metadata* = '1' in its request header.
+exhibits the attribute *icy-metadata* = '1' in its request header.
 For the time being we utilize metadata of the mp3-files that 
-comprise title, album and genre.
+comprise title, album and genre. We got two solutions, comprising a asnychronous
+and a synchronous version of the streaming server.

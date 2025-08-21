@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# ToDo yet to investigate:
+#  https://docs.ray.io/en/latest/serve/http-guide.html
+#  https://github.com/encode/starlette/discussions/2094
+
+import asyncio
 import os
 import random
 import time
@@ -7,10 +12,11 @@ from queue import Queue
 from threading import Thread, Event
 from typing import Generator, Iterator, Any
 
-from fastapi import FastAPI, HTTPException, Request
+import aiofiles
+from fastapi import FastAPI, HTTPException
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import StreamingResponse, PlainTextResponse, FileResponse
-from starlette.datastructures import Headers
+from starlette.requests import Request
 from tinytag import TinyTag
 
 ICY_METADATA_INTERVAL = 16 * 1024  # bytes
@@ -27,10 +33,23 @@ if p := os.getenv("MP3_DIR"): PATH = p
 evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 
+class MyMP3Reader:
+    """
+    Wrapper for aiofiles to circumvent an errorneous
+    aiofiles implementation of the __aexit__ method.
+    """
+    def __init__(self, file: str, mode: str):
+        self.file = file
+        self.mode = mode
+
+    async def __aenter__(self): return await aiofiles.open(self.file, self.mode)
+    async def __aexit__(self, exc_type, exc_val, exc_tb): pass
+
+
 def endless_generator(iterable: list[str]) -> Iterator[Any]:
     """
     Endless generator that yields items from the iterable indefinitely.
-    :param iterable: an iterable object, i.e. list
+    :param iterable: an iterable object, i.e. list of strings
     :return: an endless iterator over the iterable
     :raises TypeError: if the iterable is not an iterable object
     """
@@ -53,7 +72,7 @@ def file_shuffle() -> list:
     return random.sample(mp3_files, len(mp3_files))
 
 
-eternal_iterator: Iterator[Any] = endless_generator(file_shuffle())
+eternal_iterator: Iterator[Any] = endless_generator(iterable=file_shuffle())
 
 
 def mp3_metadata(
@@ -141,7 +160,7 @@ def injector(
     another
     :return: None
     """
-    streaming_title: Iterator[Any] = endless_generator(msg)
+    streaming_title: Iterator[Any] = endless_generator(iterable=msg)
     while True:
         if event.is_set(): break
         if q.empty():
@@ -185,9 +204,9 @@ def preprocess_metadata(
     return r
 
 
-def iterfile_mod(
+async def iterfile_mod(
         path: str,
-        request_headers: Headers = None,
+        request: Request = None,
         msg: list = None,
         bitrate: float = None,
 ) -> Generator[bytes, None, None]:
@@ -196,7 +215,7 @@ def iterfile_mod(
     also yield metadata. The stream is delayed by a retention time, depending on
     the bitrate and the ICY_METADATA_INTERVAL.
     :param path: path to the mp3 file
-    :param request_headers: headers of the request, used to identify the client
+    :param request: client request, used to identify the client
     :param msg: msg to be injected into the stream
     :param bitrate: bitrate of the mp3 file in kBits/s
     :return: Iterator[bytes] for StreamingResponse
@@ -207,7 +226,7 @@ def iterfile_mod(
     """
     q: Queue = None
 
-    if flag := request_headers.get('icy-metadata') == '1':
+    if flag := request.headers.get('icy-metadata') == '1':
         q = Queue()
         event = Event()
         t = Thread(
@@ -220,7 +239,7 @@ def iterfile_mod(
         for item in evts:
             print(item)
         for v in filter(lambda person: person['client'] ==
-                                       request_headers['user-agent'], evts):
+                                       request.headers['user-agent'], evts):
             v['event'].set()
             if not v['thread'].is_alive():
                 v['thread'].join()
@@ -232,7 +251,7 @@ def iterfile_mod(
                 evts.remove(v)  # remove old items from list
         evts.append(  # append current thread, queue and event
             {
-                'client': request_headers['user-agent'],
+                'client': request.headers['user-agent'],
                 'thread': t,
                 'queue': q,
                 'event': event
@@ -242,12 +261,11 @@ def iterfile_mod(
     correction = 0.
     t_total = 0.
 
-    with open(
+    async with MyMP3Reader(
             file=path,
             mode="rb") as mp3_stream:
         t_start = time.time()
-
-        while chunk := mp3_stream.read(ICY_METADATA_INTERVAL):
+        while chunk := await mp3_stream.read(ICY_METADATA_INTERVAL):
             yield chunk
 
             if flag:
@@ -257,16 +275,23 @@ def iterfile_mod(
                     streaming_title = q.get_nowait()
                     q.task_done()
                     yield preprocess_metadata(metadata=streaming_title)
+                future = retention - correction
+                if future < 0:
+                    future = -future
+                    t_total = 0.
+                    t_start = time.time() + future - retention
                 try:
-                    time.sleep(retention - correction)
-                # if streaming is discontinued, sleep argument may become
-                # negative for last yield
-                except ValueError:
+                    await asyncio.sleep(future)
+                except asyncio.CancelledError:
+                    print(f"CancelledError: Streaming interrupted by client: "
+                          f"{request.headers['user-agent']}.")
                     break
+                # print(await request.is_disconnected())
                 t_total += retention
                 correction = time.time() - t_start - t_total
-                # print(time.time() - t_start, t_total)
-    print(f"End of method reached for: {request_headers['user-agent']}")
+                # print(correction, time.time() - t_start, t_total)
+
+    print(f"Streaming ended for: {request.headers['user-agent']}")
 
 
 app: FastAPI = FastAPI(
@@ -281,8 +306,7 @@ app: FastAPI = FastAPI(
     tags=[""],
     name="Streaming A Collection Of MP3-Files Randomly")
 async def post_media_stream(request: Request):
-    request_headers = request.headers
-    print("/api/webradio caller: ", request_headers)
+    print("/api/webradio caller: ", request.headers)
 
     try:
         while True:
@@ -298,14 +322,14 @@ async def post_media_stream(request: Request):
                 time.asctime(time.localtime()),
                 item))
             headers: dict = header(meta=meta)
-            if request_headers.get('icy-metadata') == '1':
+            if request.headers.get('icy-metadata') == '1':
                 # enhance headers by ICY_METADATA_INTERVAL
                 headers['icy-metaint'] = str(ICY_METADATA_INTERVAL)
 
             return StreamingResponse(
                 content=iterfile_mod(
                     path=item,
-                    request_headers=request.headers,
+                    request=request,
                     msg=msg,
                     bitrate=meta.get('bitrate')),
                 media_type="audio/mpeg",

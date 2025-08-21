@@ -18,11 +18,11 @@ __copyright__ = ("Copyright (c) 2023-2025, Dr. Ralf Antonius Timmermann "
                  "All rights reserved.")
 __credits__ = ""
 __license__ = "BSD-3-Clause"
-__version__ = "2.6.0"
+__version__ = "2.7.0"
 __maintainer__ = "Dr. Ralf Antonius Timmermann"
 __email__ = "ralf.timmermann@gmx.de"
 __status__ = "Prod"
 
-from src.webradio_stream_meta import main
+from src.webradio_stream_async import main
 
 main()

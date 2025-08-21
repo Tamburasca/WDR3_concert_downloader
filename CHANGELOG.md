@@ -6,6 +6,14 @@
 ### Deprecated
 ### Removed
 ### Security
+## 2.7.0 (2025-08-21)
+### Added
+- Asynchronous streaming server for mp3 files.
+### Changed
+### Fixed
+### Deprecated
+### Removed
+### Security
 ## 2.6.0 (2025-08-15)
 ### Added
 ### Changed
