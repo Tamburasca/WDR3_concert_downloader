@@ -275,13 +275,10 @@ async def iterfile_mod(
                     streaming_title = q.get_nowait()
                     q.task_done()
                     yield preprocess_metadata(metadata=streaming_title)
-                future = retention - correction
-                if future < 0:
-                    future = -future
-                    t_total = 0.
-                    t_start = time.time() + future - retention
+                delay = retention - correction
+                if delay < 0: delay = retention
                 try:
-                    await asyncio.sleep(future)
+                    await asyncio.sleep(delay=delay)
                 except asyncio.CancelledError:
                     print(f"CancelledError: Streaming interrupted by client: "
                           f"{request.headers['user-agent']}.")
