@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Downgrade the quality of a mp3 input file for a smaller sized output file.
+Downgrade the quality of a mp3 input file to a smaller sized output file.
 A mp3 input file is read and converted to a wav file stored temporily in memory,
 subsequently converted again to a mp3 file by multiplying a factor <1
 to the bit-rate.

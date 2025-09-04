@@ -3,6 +3,9 @@
 # ToDo yet to investigate:
 #  https://docs.ray.io/en/latest/serve/http-guide.html
 #  https://github.com/encode/starlette/discussions/2094
+#  investiagate the communication between the client and server via:
+#  sudo tcpdump -w dump.txt -i br-03b80e976dba src 192.168.178.28 -A
+#  check interface id via ifconfig
 
 import asyncio
 import os
@@ -10,7 +13,7 @@ import random
 import time
 from queue import Queue
 from threading import Thread, Event
-from typing import Generator, Iterator, Any
+from typing import Generator, Iterator
 
 import aiofiles
 from fastapi import FastAPI, HTTPException
@@ -35,7 +38,7 @@ evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 class MyMP3Reader:
     """
-    Wrapper for aiofiles to circumvent an errorneous
+    Wrapper for aiofiles to circumvent a peculiarity of the
     aiofiles implementation of the __aexit__ method.
     """
     def __init__(self, file: str, mode: str):
@@ -46,7 +49,7 @@ class MyMP3Reader:
     async def __aexit__(self, exc_type, exc_val, exc_tb): pass
 
 
-def endless_generator(iterable: list[str]) -> Iterator[Any]:
+def endless_generator(iterable: list[str]) -> Iterator[str]:
     """
     Endless generator that yields items from the iterable indefinitely.
     :param iterable: an iterable object, i.e. list of strings
@@ -72,7 +75,7 @@ def file_shuffle() -> list:
     return random.sample(mp3_files, len(mp3_files))
 
 
-eternal_iterator: Iterator[Any] = endless_generator(iterable=file_shuffle())
+eternal_iterator: Iterator[str] = endless_generator(iterable=file_shuffle())
 
 
 def mp3_metadata(
@@ -160,7 +163,7 @@ def injector(
     another
     :return: None
     """
-    streaming_title: Iterator[Any] = endless_generator(iterable=msg)
+    streaming_title: Iterator[str] = endless_generator(iterable=msg)
     while True:
         if event.is_set(): break
         if q.empty():
@@ -236,8 +239,8 @@ async def iterfile_mod(
 
         if evts:
             print("Items in thread list (Event: 'is set' will be deleted):")
-        for item in evts:
-            print(item)
+            for item in evts:
+                print(item)
         for v in filter(lambda person: person['client'] ==
                                        request.headers['user-agent'], evts):
             v['event'].set()
