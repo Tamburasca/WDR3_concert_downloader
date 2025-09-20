@@ -11,6 +11,7 @@ import asyncio
 import os
 import random
 import time
+import timeit
 from queue import Queue
 from threading import Thread, Event
 from typing import Generator, Iterator
@@ -98,7 +99,7 @@ def mp3_metadata(
         "disc_total": tag.disc_total,  # total number of discs as integer
         "genre": tag.genre,  # genre as string
         "title": tag.title  # title of track as string, mp3-filename otherwise
-        if tag.title else os.path.basename(filepath).rstrip(".mp3"),
+            if tag.title else os.path.basename(filepath).rstrip(".mp3"),
         "track": tag.track,  # track number as integer
         "track_total": tag.track_total,  # total number of tracks as integer
         "year": tag.year,  # year or date as string
@@ -166,8 +167,7 @@ def injector(
     streaming_title: Iterator[str] = endless_generator(iterable=msg)
     while True:
         if event.is_set(): break
-        if q.empty():
-            q.put(next(streaming_title))
+        if q.empty(): q.put(next(streaming_title))
         time.sleep(TIME_INJECT)
     # clean up the queue, there should be only one item left
     if not q.empty():
@@ -267,7 +267,7 @@ async def iterfile_mod(
     async with MyMP3Reader(
             file=path,
             mode="rb") as mp3_stream:
-        t_start = time.time()
+        t_start = timeit.default_timer()
         while chunk := await mp3_stream.read(ICY_METADATA_INTERVAL):
             yield chunk
 
@@ -279,7 +279,8 @@ async def iterfile_mod(
                     q.task_done()
                     yield preprocess_metadata(metadata=streaming_title)
                 delay = retention - correction
-                if delay < 0: delay = retention
+                if delay < 0:
+                    delay = retention
                 try:
                     await asyncio.sleep(delay=delay)
                 except asyncio.CancelledError:
@@ -288,8 +289,8 @@ async def iterfile_mod(
                     break
                 # print(await request.is_disconnected())
                 t_total += retention
-                correction = time.time() - t_start - t_total
-                # print(correction, time.time() - t_start, t_total)
+                correction = timeit.default_timer() - t_start - t_total
+                # print(correction, timeit.default_timer() - t_start, t_total)
 
     print(f"Streaming ended for: {request.headers['user-agent']}")
 

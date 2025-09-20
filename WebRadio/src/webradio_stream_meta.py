@@ -3,6 +3,7 @@
 import os
 import random
 import time
+import timeit
 from queue import Queue
 from threading import Thread, Event
 from typing import Generator, Iterator, Any
@@ -245,7 +246,7 @@ def iterfile_mod(
     with open(
             file=path,
             mode="rb") as mp3_stream:
-        t_start = time.time()
+        t_start = timeit.default_timer()
 
         while chunk := mp3_stream.read(ICY_METADATA_INTERVAL):
             yield chunk
@@ -264,8 +265,8 @@ def iterfile_mod(
                 except ValueError:
                     break
                 t_total += retention
-                correction = time.time() - t_start - t_total
-                # print(time.time() - t_start, t_total)
+                correction = timeit.default_timer() - t_start - t_total
+                # print(timeit.default_timer() - t_start, t_total)
     print(f"End of method reached for: {request_headers['user-agent']}")
 
 
