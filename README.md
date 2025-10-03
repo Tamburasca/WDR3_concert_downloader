@@ -1,9 +1,9 @@
 # WDR3 Concert Downloader
 
-Downloads any concert's audio mp3 file encountered on a WDR3 concert player 
-website. This feature is useful, since no mp3 file download button might be 
-dispositional to the audience and, moreover, the mp3 stream is only available 
-for a limited re-listening period after its broadcast.
+Downloads any live recording mp3 file encountered on a WDR3 concert player 
+website. This feature is useful, if no mp3 file download button is 
+dispositional to the audience and, moreover, the mp3 stream is available 
+only for a limited re-listening period after its broadcast.
 
 From the address bar of your web browser copy the url of the 
 website, where the concert resides and execute the following command:
