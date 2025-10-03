@@ -43,9 +43,7 @@ class MyMP3Reader:
     aiofiles implementation of the __aexit__ method.
     """
     def __init__(self, file: str, mode: str):
-        self.file = file
-        self.mode = mode
-
+        self.file, self.mode = file, mode
     async def __aenter__(self): return await aiofiles.open(self.file, self.mode)
     async def __aexit__(self, exc_type, exc_val, exc_tb): pass
 
@@ -279,8 +277,7 @@ async def iterfile_mod(
                     q.task_done()
                     yield preprocess_metadata(metadata=streaming_title)
                 delay = retention - correction
-                if delay < 0:
-                    delay = retention
+                if delay < 0: delay = retention
                 try:
                     await asyncio.sleep(delay=delay)
                 except asyncio.CancelledError:
@@ -295,7 +292,7 @@ async def iterfile_mod(
     print(f"Streaming ended for: {request.headers['user-agent']}")
 
 
-app: FastAPI = FastAPI(
+app = FastAPI(
     docs_url=None,
     redoc_url=None,
     title="Internetradio Web Server"

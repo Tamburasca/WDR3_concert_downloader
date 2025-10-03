@@ -1,4 +1,4 @@
-uvicorn==0.35.0
-fastapi==0.116.1
+uvicorn==0.37.0
+fastapi==0.118.0
 tinytag==2.1.2
 aiofiles==24.1.0
