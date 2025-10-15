@@ -74,9 +74,6 @@ def file_shuffle() -> list:
     return random.sample(mp3_files, len(mp3_files))
 
 
-eternal_iterator: Iterator[str] = endless_generator(iterable=file_shuffle())
-
-
 def mp3_metadata(
         filepath: str
 ) -> dict:
@@ -127,7 +124,7 @@ def header(
         "content-type": "audio/mpeg",
         "Pragma": "no-cache",
         "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
-        "Connection": "Close, close", # "Keep-Alive",
+        "Connection": "Close, close",  # "Keep-Alive",
         "Transfer-Encoding": "chunked",
         "icy-br": str(meta.get('bitrate')),
         "icy-samplerate": str(meta.get('samplerate')),
@@ -195,9 +192,9 @@ def preprocess_metadata(
         # number of blocks of ICY_BYTES_BLOCK_SIZE needed for this meta message
         # (NOT including this byte), ceil notation
             icy_no_blocks.to_bytes(1, byteorder="big")
-        # meta message encoded
+            # meta message encoded
             + icy_metadata_formatted
-        # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
+            # zero-padded tail to fill the last ICY_BYTES_BLOCK_SIZE
             + (icy_no_blocks * ICY_BYTES_BLOCK_SIZE - icy_metadata_block_length)
             * ZERO_BYTE
     )
@@ -291,6 +288,8 @@ async def iterfile_mod(
 
     print(f"Streaming ended for: {request.headers['user-agent']}")
 
+
+eternal_iterator: Iterator[str] = endless_generator(iterable=file_shuffle())
 
 app = FastAPI(
     docs_url=None,
