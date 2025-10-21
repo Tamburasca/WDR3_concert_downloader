@@ -4,4 +4,3 @@ requests>=2.32.3
 setuptools>=80.9.0
 js2py-3.13>=0.74.1
 pymp3==0.2.0
-js2py-3.13==0.74.1
