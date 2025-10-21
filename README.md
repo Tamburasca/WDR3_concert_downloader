@@ -44,3 +44,10 @@ exhibits the attribute *icy-metadata* = '1' in its request header.
 For the time being we utilize metadata of the mp3-files that 
 comprise title, album and genre. We got two solutions, comprising both an 
 asynchronous and a synchronous version of the streaming server.
+
+The internetradio is invoked by addressing the following endpoint
+
+    http://<your host ip>:5010/api/webradio
+
+Owing to the nature of the web server another mp3 file is streamed after 
+each call of above endpoint. 
