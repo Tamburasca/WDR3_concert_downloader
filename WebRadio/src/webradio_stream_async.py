@@ -14,7 +14,7 @@ import time
 import timeit
 from queue import Queue
 from threading import Thread, Event
-from typing import Iterator, AsyncGenerator
+from typing import Iterator, AsyncGenerator, TypeAlias
 
 import aiofiles
 from fastapi import FastAPI, HTTPException
@@ -22,6 +22,8 @@ from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import StreamingResponse, PlainTextResponse, FileResponse
 from starlette.requests import Request
 from tinytag import TinyTag
+
+C: TypeAlias = str | bytes  # workaround for aiofiles.read returning bytes instead of str when reading byte files
 
 ICY_METADATA_INTERVAL = 16 * 1024  # bytes
 ICY_BYTES_BLOCK_SIZE = 16  # bytes
@@ -222,6 +224,7 @@ async def iterfile_mod(
     by the client - becomes negative, i.e. discontinues the byte stream
     :raises HTTPException: if the file is not found or any other error occurs
     """
+    chunk: C
     q = Queue()
 
     if flag := request.headers.get('icy-metadata') == '1':
