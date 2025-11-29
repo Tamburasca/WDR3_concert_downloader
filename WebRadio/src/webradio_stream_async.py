@@ -24,6 +24,7 @@ from starlette.requests import Request
 from tinytag import TinyTag
 
 C: TypeAlias = str | bytes  # workaround for aiofiles.read returning bytes instead of str when reading byte files
+evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 ICY_METADATA_INTERVAL = 16 * 1024  # bytes
 ICY_BYTES_BLOCK_SIZE = 16  # bytes
@@ -35,8 +36,6 @@ FAVICON_ICO = f"{SOURCE_PATH}/../img/favicon.png"
 PATH = "/app/data/"  # where the mp3 reside inside docker
 # for testing define environment variable MP3_DIR to overwrite
 if p := os.getenv("MP3_DIR"): PATH = p
-
-evts = list()  # list of threads, queues, and events for subsequent cleansing
 
 
 class MyMP3Reader:
@@ -225,9 +224,12 @@ async def iterfile_mod(
     :raises HTTPException: if the file is not found or any other error occurs
     """
     chunk: C
-    q = Queue()
+    retention = ICY_METADATA_INTERVAL / (bitrate * 1000 / 8)
+    correction = 0.
+    t_total = 0.
 
     if flag := request.headers.get('icy-metadata') == '1':
+        q = Queue()
         event = Event()
         t = Thread(
             target=injector,
@@ -256,10 +258,6 @@ async def iterfile_mod(
                 'queue': q,
                 'event': event
             })
-
-    retention = ICY_METADATA_INTERVAL / (bitrate * 1000 / 8)
-    correction = 0.
-    t_total = 0.
 
     async with MyMP3Reader(
             file=path,
